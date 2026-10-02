@@ -97,7 +97,7 @@ td input{max-width:150px;padding:.35rem .6rem;font-size:.82rem}
 footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
 @media(max-width:700px){.bcard{grid-template-columns:72px 1fr}.cap{grid-column:2;justify-self:start}.occ{grid-template-columns:1fr}.masthead{padding:1.4rem 1.2rem}}
 @page{size:A4;margin:8mm}
-@media print{body{background:#fff;padding:0;font-size:8pt}.bar,.stats,.nav,footer,.empty,.ov,#home,#badge,.notice,#toast{display:none!important}#list{display:block!important}.masthead{padding:.6rem 1rem;box-shadow:none}.chips{display:none}.bcard{break-inside:avoid;padding:.35rem .6rem;box-shadow:none}.wing.break{break-before:page}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{body{background:#fff;padding:0;font-size:8pt}.bar,.stats,.nav,footer,.empty,.ov,#home,#badge,#list,.notice,#toast,.noprint{display:none!important}body[data-s=list] #list,body[data-s=badge] #badge{display:block!important}.badge{box-shadow:none;margin-top:2rem}.masthead{padding:.6rem 1rem;box-shadow:none}.chips{display:none}.bcard{break-inside:avoid;padding:.35rem .6rem;box-shadow:none}.wing.break{break-before:page}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
@@ -133,7 +133,7 @@ footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
     <h2 id="b-name" style="margin-top:.3rem"></h2>
     <div class="room-tag" id="b-room"></div>
     <div class="mates"><b style="font-size:.9rem">Colegas de quarto</b><ul id="b-mates"></ul></div>
-    <button class="btn btn-p" style="margin-top:1.3rem;width:100%" onclick="window.print()">Imprimir ou salvar</button>
+    <button class="btn btn-p noprint" style="margin-top:1.3rem;width:100%" onclick="window.print()">Imprimir ou salvar</button>
   </div>
 </main>
 
@@ -264,7 +264,7 @@ db.ref("cjas_announcement").on("value",s=>{const m=s.val();$("notice").style.dis
 function refresh(){renderList();updateStats();if(logged)renderAdmin()}
 
 /* ---------- telas ---------- */
-function show(id){["home","badge","list"].forEach(s=>$(s).style.display=s===id?"block":"none");scrollTo(0,0)}
+function show(id){document.body.dataset.s=id;["home","badge","list"].forEach(s=>$(s).style.display=s===id?"block":"none");scrollTo(0,0)}
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeM(b.dataset.close));
 
