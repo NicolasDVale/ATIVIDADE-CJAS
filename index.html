@@ -393,6 +393,18 @@ body {
 }
 .btn-primary:hover { background: #334155; }
 
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-danger:hover { background: #b91c1c; }
+
 .btn-print {
   border: 0;
   background: #0f172a;
@@ -555,7 +567,7 @@ body {
 .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
 .admin-table th, .admin-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .admin-table th { background: var(--bg); color: var(--muted); font-size: 0.7rem; text-transform: uppercase; position: sticky; top: 0; z-index: 2; }
-.admin-table input[type="text"] { padding: 0.4rem 0.6rem; font-size: 0.82rem; border: 1px solid var(--line); border-radius: 6px; width: 100%; max-width: 220px; }
+.admin-table input[type="text"] { padding: 0.4rem 0.6rem; font-size: 0.82rem; border: 1px solid var(--line); border-radius: 6px; width: 100%; max-width: 180px; }
 .btn-save-doc { background: #1a73e8; color: #fff; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
 .btn-save-doc:hover { background: #1557b0; }
 
@@ -699,20 +711,20 @@ footer b { color: var(--ink); }
     <!-- Métricas -->
     <div class="stats-grid">
       <div class="stat-card">
-        <span class="val">199</span>
+        <span class="val" id="stat-total">199</span>
         <span class="lbl">Total de Hóspedes</span>
       </div>
       <div class="stat-card">
-        <span class="val">89</span>
+        <span class="val" id="stat-fem">89</span>
         <span class="lbl">Ala Feminina</span>
       </div>
       <div class="stat-card">
-        <span class="val">104</span>
+        <span class="val" id="stat-masc">104</span>
         <span class="lbl">Ala Masculina</span>
       </div>
       <div class="stat-card">
-        <span class="val" style="color:var(--ok);">4</span>
-        <span class="lbl">Vagas Livres (Ala Masc.)</span>
+        <span class="val" id="stat-free" style="color:var(--ok);">4</span>
+        <span class="lbl">Vagas Livres</span>
       </div>
     </div>
 
@@ -754,6 +766,8 @@ footer b { color: var(--ink); }
 </div>
 
 <!-- MODAIS -->
+
+<!-- MODAL LOGIN ADMIN -->
 <div class="modal-overlay" id="modal-login">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-login')">✕</button>
@@ -767,25 +781,37 @@ footer b { color: var(--ink); }
       <div class="form-group">
         <label>Senha</label>
         <input type="password" id="admin-pass" placeholder="Digite sua senha" required>
+        <small style="display:block; color:var(--muted); font-size:0.75rem; margin-top:0.3rem;">Senha padrão inicial: <b>cjas2026</b></small>
       </div>
       <button type="submit" class="btn-primary" style="width:100%;">Acessar Painel</button>
     </form>
+    <div style="margin-top:1rem; text-align:center;">
+      <button onclick="resetAdminPasswordDefault()" style="background:none; border:none; color:var(--masc); font-size:0.8rem; text-decoration:underline; cursor:pointer;">
+        Esqueceu a senha? Redefinir para padrão (cjas2026)
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL ADMIN COM TABELA DE INSERÇÃO DE DOCUMENTOS (RG/CPF) -->
+<!-- MODAL ADMIN COM GESTÃO DE PARTICIPANTES (RG/CPF / NOVO / EXPORTAR) -->
 <div class="modal-overlay" id="modal-admin-panel">
-  <div class="modal" style="max-width: 720px;">
+  <div class="modal" style="max-width: 800px;">
     <button class="modal-close" onclick="closeModal('modal-admin-panel')">✕</button>
-    <h3 style="margin-bottom:0.2rem;">Gestão de Participantes & RG/CPF</h3>
-    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Escreva o documento (RG/CPF) dos participantes ou faça transferências de quarto.</p>
+    <h3 style="margin-bottom:0.2rem;">Gestão da Liderança · CJAS 2026</h3>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Gerencie documentos (RG/CPF), adicione participantes, transfira ou exclua registros.</p>
     
     <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
-      <button class="filter-btn" onclick="openModal('modal-change-pass')">Alterar Senha</button>
-      <button class="filter-btn" onclick="logoutAdmin()" style="color:var(--fem);">Sair</button>
+      <button class="btn-primary" style="padding:0.45rem 0.85rem; font-size:0.8rem;" onclick="openAddPersonModal()">
+        ➕ Novo Participante
+      </button>
+      <button class="filter-btn" style="background:#059669; color:#fff; border-color:#059669;" onclick="exportToCSV()">
+        📥 Exportar Planilha (CSV)
+      </button>
+      <button class="filter-btn" onclick="openModal('modal-change-pass')">🔑 Alterar Senha</button>
+      <button class="filter-btn" onclick="logoutAdmin()" style="color:var(--fem);">🚪 Sair</button>
     </div>
 
-    <input id="admin-search-input" type="search" placeholder="Filtrar por nome ou bangalô…" oninput="renderAdminTable()" style="width:100%; padding:0.6rem 0.9rem; border-radius:8px; border:1px solid var(--line); font-size:0.85rem; margin-bottom:0.8rem;">
+    <input id="admin-search-input" type="search" placeholder="Filtrar tabela por nome ou bangalô…" oninput="renderAdminTable()" style="width:100%; padding:0.6rem 0.9rem; border-radius:8px; border:1px solid var(--line); font-size:0.85rem; margin-bottom:0.8rem;">
 
     <div class="admin-table-container">
       <table class="admin-table">
@@ -793,8 +819,8 @@ footer b { color: var(--ink); }
           <tr>
             <th>Nome</th>
             <th>Bangalô</th>
-            <th>Número (RG/CPF)</th>
-            <th style="width:160px;">Ações</th>
+            <th>Documento (RG/CPF)</th>
+            <th style="width:190px;">Ações</th>
           </tr>
         </thead>
         <tbody id="admin-tbody"></tbody>
@@ -803,6 +829,27 @@ footer b { color: var(--ink); }
   </div>
 </div>
 
+<!-- MODAL NOVO PARTICIPANTE -->
+<div class="modal-overlay" id="modal-add-person">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-add-person')">✕</button>
+    <h3>Adicionar Novo Participante</h3>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Insira o nome do participante e escolha o bangalô para alocá-lo.</p>
+    <form onsubmit="confirmAddPerson(event)">
+      <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" id="new-person-name" placeholder="Ex: João da Silva" required>
+      </div>
+      <div class="form-group">
+        <label>Selecione o Bangalô</label>
+        <select id="new-person-room" required></select>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;">Adicionar e Salvar</button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL TRANSFERÊNCIA -->
 <div class="modal-overlay" id="modal-transfer">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-transfer')">✕</button>
@@ -816,6 +863,7 @@ footer b { color: var(--ink); }
   </div>
 </div>
 
+<!-- MODAL ALTERAR SENHA -->
 <div class="modal-overlay" id="modal-change-pass">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-change-pass')">✕</button>
@@ -831,7 +879,7 @@ footer b { color: var(--ink); }
 </div>
 
 <script>
-// Base de Dados
+// Base de Dados Inicial
 const INITIAL_DATA = [
   {
     cls: "casal",
@@ -949,11 +997,13 @@ db.ref('cjas_data').on('value', snapshot => {
     currentData = INITIAL_DATA;
   }
   renderApp();
+  updateStats();
   if (isLoggedIn) renderAdminTable();
 }, err => {
   console.warn("Firebase offline/não alcançado, usando dados locais:", err);
   currentData = INITIAL_DATA;
   renderApp();
+  updateStats();
 });
 
 db.ref('cjas_docs').on('value', snapshot => {
@@ -965,11 +1015,52 @@ db.ref('cjas_docs').on('value', snapshot => {
 });
 
 db.ref('cjas_pass').on('value', snapshot => {
-  if (snapshot.val()) adminPass = snapshot.val();
+  if (snapshot.val()) {
+    adminPass = snapshot.val();
+  } else {
+    db.ref('cjas_pass').set('cjas2026');
+  }
 });
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// Atualizar Métricas / Estatísticas Dinâmicas
+function updateStats() {
+  let total = 0, fem = 0, masc = 0, capacity = 0;
+
+  toArray(currentData).forEach(sec => {
+    toArray(sec.groups).forEach(g => {
+      toArray(g.rows).forEach(row => {
+        if (!row) return;
+        const cap = Number(row[1]) || 0;
+        capacity += cap;
+
+        let count = 0;
+        if (sec.cls === "casal") {
+          count = 2;
+        } else {
+          const names = typeof row[2] === "string" ? row[2].split(", ") : toArray(row[2]);
+          count = names.filter(n => n.trim().length > 0).length;
+        }
+
+        total += count;
+        if (sec.cls === "fem") fem += count;
+        if (sec.cls === "masc") masc += count;
+      });
+    });
+  });
+
+  const elTot = document.getElementById('stat-total');
+  const elFem = document.getElementById('stat-fem');
+  const elMasc = document.getElementById('stat-masc');
+  const elFree = document.getElementById('stat-free');
+
+  if (elTot) elTot.textContent = total;
+  if (elFem) elFem.textContent = fem;
+  if (elMasc) elMasc.textContent = masc;
+  if (elFree) elFree.textContent = Math.max(0, capacity - total);
+}
 
 // Extrai Todos os Nomes para a Busca e Autocompletar
 function getAllNames() {
@@ -1286,7 +1377,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
   });
 });
 
-/* PAINEL DA LIDERANÇA & TABELA DE DOCUMENTOS */
+/* PAINEL DA LIDERANÇA & GESTÃO */
 function openAdminArea() {
   if (isLoggedIn) openModal('modal-admin-panel');
   else openModal('modal-login');
@@ -1304,7 +1395,15 @@ function handleAdminLogin(e) {
     openModal('modal-admin-panel');
     renderAdminTable();
   } else {
-    alert('Usuário ou senha incorretos!');
+    alert(`Usuário ou senha incorretos!\nSenha atual esperada: "${adminPass}"`);
+  }
+}
+
+function resetAdminPasswordDefault() {
+  if (confirm('Deseja redefinir a senha da liderança para o valor padrão ("cjas2026")?')) {
+    adminPass = 'cjas2026';
+    db.ref('cjas_pass').set('cjas2026');
+    alert('Senha redefinida com sucesso para: cjas2026');
   }
 }
 
@@ -1314,7 +1413,7 @@ function logoutAdmin() {
   closeModal('modal-admin-panel');
 }
 
-// Renderização da Tabela de Documentos (RG/CPF)
+// Renderização da Tabela do Admin (RG/CPF + Transferência + Exclusão)
 function renderAdminTable() {
   const tbody = document.getElementById('admin-tbody');
   if (!tbody) return;
@@ -1355,9 +1454,10 @@ function renderAdminTable() {
             <td>
               <input type="text" id="doc-${rowIndex}" value="${docData.documento || ''}" placeholder="Digite RG ou CPF">
             </td>
-            <td style="display:flex; gap:6px;">
-              <button class="btn-save-doc" onclick="salvarDocumento('${safeName}', ${rowIndex})">Salvar</button>
-              <button class="filter-btn" style="padding:0.2rem 0.5rem; font-size:0.72rem;" onclick="openTransferModal('${safeName}', '${id}')">Mudar Bangalô</button>
+            <td style="display:flex; gap:4px; align-items:center;">
+              <button class="btn-save-doc" title="Salvar Documento" onclick="salvarDocumento('${safeName}', ${rowIndex})">Salvar</button>
+              <button class="filter-btn" style="padding:0.25rem 0.5rem; font-size:0.72rem;" title="Mudar de Quarto" onclick="openTransferModal('${safeName}', '${id}')">Mudar</button>
+              <button class="btn-danger" title="Excluir Participante" onclick="deletePerson('${safeName}', '${id}')">🗑️</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -1375,12 +1475,128 @@ function salvarDocumento(personName, index) {
     documento: newDoc
   };
 
-  // Salva no LocalStorage e no Firebase
   localStorage.setItem('cjas_docs', JSON.stringify(participantDocs));
   db.ref(`cjas_docs/${personName}`).set(participantDocs[personName]);
 
   renderAdminTable();
   alert(`Documento de "${personName}" salvo com sucesso!`);
+}
+
+// ADICIONAR NOVO PARTICIPANTE
+function openAddPersonModal() {
+  const select = document.getElementById('new-person-room');
+  select.innerHTML = '';
+
+  toArray(currentData).forEach(sec => {
+    toArray(sec.groups).forEach(g => {
+      toArray(g.rows).forEach(row => {
+        if (!row) return;
+        const id = row[0];
+        const cap = row[1];
+        const raw = row[2];
+        let names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
+
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = `Bangalô ${id} (${sec.title}) - Ocupação: ${names.length}/${cap}`;
+        select.appendChild(option);
+      });
+    });
+  });
+
+  openModal('modal-add-person');
+}
+
+function confirmAddPerson(e) {
+  e.preventDefault();
+  const name = document.getElementById('new-person-name').value.trim();
+  const roomId = document.getElementById('new-person-room').value;
+
+  if (!name || !roomId) return;
+
+  toArray(currentData).forEach(sec => {
+    toArray(sec.groups).forEach(g => {
+      toArray(g.rows).forEach(row => {
+        if (row && row[0] === roomId) {
+          let names = typeof row[2] === "string" ? row[2].split(", ") : toArray(row[2]);
+          names.push(name);
+          row[2] = names.join(", ");
+        }
+      });
+    });
+  });
+
+  db.ref('cjas_data').set(currentData);
+  closeModal('modal-add-person');
+  document.getElementById('new-person-name').value = '';
+  alert(`Participante "${name}" adicionado com sucesso ao Bangalô ${roomId}!`);
+}
+
+// EXCLUIR PARTICIPANTE
+function deletePerson(personName, roomId) {
+  if (!confirm(`Tem certeza de que deseja excluir "${personName}" do Bangalô ${roomId}?`)) return;
+
+  toArray(currentData).forEach(sec => {
+    toArray(sec.groups).forEach(g => {
+      toArray(g.rows).forEach(row => {
+        if (row && row[0] === roomId) {
+          let names = typeof row[2] === "string" ? row[2].split(", ") : toArray(row[2]);
+          names = names.filter(p => !p.includes(personName));
+          row[2] = names.join(", ");
+        }
+      });
+    });
+  });
+
+  if (participantDocs[personName]) {
+    delete participantDocs[personName];
+    db.ref(`cjas_docs/${personName}`).remove();
+    localStorage.setItem('cjas_docs', JSON.stringify(participantDocs));
+  }
+
+  db.ref('cjas_data').set(currentData);
+  alert(`Participante "${personName}" removido com sucesso.`);
+}
+
+// EXPORTAR RELATÓRIO COMPLETO EM CSV
+function exportToCSV() {
+  let csvContent = "\uFEFF"; // BOM para suporte a acentos no Excel
+  csvContent += "Nome;Bangalô;Ala / Setor;Documento (RG/CPF)\n";
+
+  toArray(currentData).forEach(sec => {
+    toArray(sec.groups).forEach(g => {
+      toArray(g.rows).forEach(row => {
+        if (!row) return;
+        const id = row[0];
+        const raw = row[2];
+
+        let names = [];
+        if (sec.cls === "casal") {
+          const m = String(raw).match(/^(.*)\s\(([^)]+)\)$/);
+          if (m) names = m[1].split(" & ");
+          else names = String(raw).split(" & ");
+        } else {
+          names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
+        }
+
+        names.forEach(person => {
+          const cleanName = String(person).replace(/\s*\([^)]+\)/g, "").trim();
+          const doc = (participantDocs[cleanName] && participantDocs[cleanName].documento) ? participantDocs[cleanName].documento : "";
+          
+          csvContent += `"${cleanName}";"Bangalô ${id}";"${sec.title}";"${doc}"\n`;
+        });
+      });
+    });
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Relatorio_CJAS_2026_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 /* TRANSFERÊNCIA E SENHA */
@@ -1397,7 +1613,7 @@ function openTransferModal(person, currentRoom) {
         const id = row[0];
         const cap = row[1];
         const raw = row[2];
-        let names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
+        let names = typeof raw === "string" ? raw.split(", ") : toArray(row[2]);
         
         const option = document.createElement('option');
         option.value = id;
@@ -1443,6 +1659,7 @@ function confirmTransfer() {
 function handleChangePassword(e) {
   e.preventDefault();
   const newP = document.getElementById('new-pass-input').value;
+  adminPass = newP;
   db.ref('cjas_pass').set(newP);
   alert('Nova senha salva com sucesso!');
   closeModal('modal-change-pass');
@@ -1451,6 +1668,7 @@ function handleChangePassword(e) {
 // Inicialização Garantida
 window.addEventListener('DOMContentLoaded', () => {
   renderApp();
+  updateStats();
 });
 </script>
 </body>
