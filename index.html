@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CJAS 2026 — Sistema de Acomodações & Check-in</title>
+<title>Distribuição de Bangalôs — CJAS 2026</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -25,34 +25,27 @@
   
   --casal: #b45309;
   --casal-bg: #fffbeb;
+  --casal-badge: #fde68a;
   --casal-border: #fcd34d;
 
   --fem: #be185d;
   --fem-bg: #fdf2f8;
+  --fem-badge: #fbcfe8;
   --fem-border: #f472b6;
 
   --masc: #1d4ed8;
   --masc-bg: #eff6ff;
+  --masc-badge: #bfdbfe;
   --masc-border: #60a5fa;
 
   --ok: #059669;
   --ok-bg: #ecfdf5;
+  --ok-border: #a7f3d0;
 
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
-  --radius: 16px;
-}
-
-body.dark {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --ink: #f8fafc;
-  --muted: #94a3b8;
-  --line: #334155;
-  --casal-bg: #271e05;
-  --fem-bg: #2d0a1a;
-  --masc-bg: #0b1e42;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --radius: 14px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,209 +54,262 @@ body {
   background-color: var(--bg);
   color: var(--ink);
   line-height: 1.5;
-  padding-bottom: 4rem;
-  transition: background-color 0.2s, color 0.2s;
+  padding: 1.5rem 1rem 4rem;
 }
+.page { max-width: 1040px; margin: 0 auto; }
 
-/* Navbar */
-.navbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding: 0.75rem 1rem;
-}
-.nav-container {
-  max-width: 1040px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.brand {
-  font-weight: 800;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.nav-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.45rem 0.85rem;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.nav-btn:hover { background: var(--line); color: var(--ink); }
-.nav-btn.active { background: var(--ink); color: var(--bg); }
-
-.page { max-width: 1040px; margin: 1.5rem auto 0; padding: 0 1rem; }
-
-.view-section { display: none; }
-.view-section.active { display: block; }
-
-/* Hero / Login Participante */
-.hero {
+/* Header Banner */
+.masthead {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
   color: #fff;
   border-radius: 20px;
-  padding: 2rem 1.5rem;
+  padding: 2.2rem 2.2rem 1.8rem;
   box-shadow: var(--shadow-md);
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-.hero h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; }
-.hero p { color: #94a3b8; margin-top: 0.4rem; font-size: 0.95rem; }
-
-.user-login-box {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-sm);
-  text-align: center;
-}
-.user-login-box h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
-.user-login-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
-.input-group {
-  display: flex;
-  gap: 0.5rem;
-  max-width: 450px;
-  margin: 0 auto;
-}
-.input-group input {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.95rem;
-}
-
-/* Badge / Crachá Digital */
-.badge-card {
-  background: var(--surface);
-  border: 2px solid var(--line);
-  border-radius: 20px;
-  padding: 1.5rem;
-  max-width: 480px;
-  margin: 0 auto 1.5rem;
-  text-align: center;
-  box-shadow: var(--shadow-md);
+  margin-bottom: 1.4rem;
   position: relative;
+  overflow: hidden;
 }
-.badge-header {
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.5rem;
+.masthead::after {
+  content: "";
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
 }
-.badge-name { font-size: 1.4rem; font-weight: 800; color: var(--ink); margin-bottom: 0.5rem; }
-.badge-room {
+.kicker {
   display: inline-block;
-  background: #0f172a;
-  color: #fff;
-  padding: 0.4rem 1.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.3rem 0.85rem;
   border-radius: 999px;
+  margin-bottom: 0.85rem;
+  color: #cbd5e1;
+}
+.masthead h1 {
+  font-size: clamp(1.45rem, 3.6vw, 2.1rem);
   font-weight: 800;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
-body.dark .badge-room { background: #38bdf8; color: #0f172a; }
-
-#qrcode {
+.masthead .sub {
+  margin-top: 0.4rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.chips {
   display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-  padding: 0.75rem;
-  background: #fff;
-  border-radius: 12px;
-  width: fit-content;
-  margin: 1rem auto;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
 }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  color: #e2e8f0;
+}
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
 
-/* Shortcuts Grid */
-.shortcut-grid {
+/* KPI Stats */
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
 }
-.shortcut-card {
+.stat-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  text-align: center;
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
   box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: transform 0.15s;
+  display: flex;
+  flex-direction: column;
 }
-.shortcut-card:hover { transform: translateY(-3px); }
-.shortcut-card .icon { font-size: 2rem; margin-bottom: 0.4rem; }
-.shortcut-card h3 { font-size: 1rem; font-weight: 700; }
+.stat-card .val {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.stat-card .lbl {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
 
-/* Control Bar & Cards */
+/* Control Bar */
 .control-bar {
-  background: var(--surface);
+  position: sticky;
+  top: 0.8rem;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 0.6rem 0.8rem;
-  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.8rem;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
   align-items: center;
-  flex-wrap: wrap;
 }
-.search-box { flex: 1; min-width: 200px; }
+.search-box {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-box svg {
+  position: absolute;
+  left: 0.9rem;
+  width: 17px;
+  height: 17px;
+  color: var(--muted);
+  pointer-events: none;
+}
 .search-box input {
   width: 100%;
   border: 1px solid var(--line);
   background: var(--bg);
   border-radius: 999px;
-  padding: 0.55rem 1rem;
+  padding: 0.55rem 1rem 0.55rem 2.35rem;
   font: inherit;
+  font-size: 0.9rem;
   color: var(--ink);
+  transition: all 0.15s;
 }
+.search-box input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+.filters {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+}
+.filter-btn {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.filter-btn:hover { background: #e2e8f0; color: var(--ink); }
+.filter-btn.active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.btn-print {
+  border: 0;
+  background: #0f172a;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-print:hover { background: #334155; }
 
-.wing { margin-top: 1.5rem; }
+/* Wings Sections */
+.wing {
+  margin-top: 2rem;
+}
 .wing-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8rem 1.2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.9rem 1.2rem;
   border-radius: 14px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-left: 6px solid var(--c);
   margin-bottom: 0.9rem;
+  box-shadow: var(--shadow-sm);
 }
+.wing-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.wing-title h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.wing-title .note {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.wing-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  background: var(--bg-c);
+  color: var(--c);
+  border: 1px solid var(--c-border);
+}
+
 .subgroup-title {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
   color: var(--muted);
-  margin: 1.2rem 0.3rem 0.5rem;
+  margin: 1.3rem 0.3rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.subgroup-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
 }
 
+/* Card de Bangalô */
 .bangalo-card {
   display: grid;
   grid-template-columns: 88px 1fr auto;
@@ -274,7 +320,14 @@ body.dark .badge-room { background: #38bdf8; color: #0f172a; }
   border-radius: var(--radius);
   padding: 0.9rem 1.15rem;
   margin-bottom: 0.6rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
+.bangalo-card:hover {
+  border-color: var(--c-border);
+  box-shadow: var(--shadow-md);
+}
+
 .bangalo-num {
   background: var(--bg-c);
   border: 1px solid var(--c-border);
@@ -283,186 +336,361 @@ body.dark .badge-room { background: #38bdf8; color: #0f172a; }
   text-align: center;
   padding: 0.5rem 0.2rem;
 }
-.bangalo-num b { font-size: 1.7rem; font-weight: 800; display: block; line-height: 1; }
-.bangalo-num small { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; }
+.bangalo-num small {
+  display: block;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+.bangalo-num b {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
 
 .occupants {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.35rem 1.2rem;
+  column-gap: 1.6rem;
+  row-gap: 0.35rem;
   font-size: 0.88rem;
 }
-.occupants li.checked-in::before { content: "✓ "; color: var(--ok); font-weight: bold; }
+.casal .occupants {
+  grid-template-columns: 1fr;
+  font-size: 0.95rem;
+}
+.occupants li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.18rem 0;
+  color: #1e293b;
+}
+.occupants li.hit {
+  background: #fef08a;
+  border-radius: 4px;
+  padding: 0.18rem 0.4rem;
+}
+
+.role-badge {
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: var(--bg-c);
+  color: var(--c);
+  border: 1px solid var(--c-border);
+  white-space: nowrap;
+}
+
+.check-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--ok-bg);
+  color: var(--ok);
+  border: 1px solid var(--ok-border);
+  text-transform: uppercase;
+}
+
+.cap-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  white-space: nowrap;
+}
+.cap-badge.full {
+  background: var(--bg-c);
+  color: var(--c);
+  border: 1px solid var(--c-border);
+}
+.cap-badge.free {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border: 1px solid var(--ok-border);
+}
 
 .casal { --c: var(--casal); --bg-c: var(--casal-bg); --c-border: var(--casal-border); }
 .fem   { --c: var(--fem);   --bg-c: var(--fem-bg);   --c-border: var(--fem-border); }
 .masc  { --c: var(--masc);  --bg-c: var(--masc-bg);  --c-border: var(--masc-border); }
 
-/* Admin Table */
-.admin-table-container {
+.empty-msg {
+  display: none;
+  text-align: center;
+  color: var(--muted);
+  padding: 3rem 1rem;
+  font-size: 0.95rem;
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
-  overflow-x: auto;
+  border: 1px dashed var(--line);
 }
-.admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
-.admin-table th, .admin-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); }
-.admin-table th { background: var(--bg); color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
 
-.btn-sm {
-  font-size: 0.75rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--ink);
-  cursor: pointer;
-  font-weight: 600;
-}
-.btn-primary {
-  padding: 0.65rem 1.2rem;
-  border-radius: 999px;
-  border: 0;
-  background: #0f172a;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-}
-body.dark .btn-primary { background: #38bdf8; color: #0f172a; }
-
-/* Modal */
+/* Modais sem Emojis */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem;
 }
 .modal-overlay.active { display: flex; }
 .modal {
   background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
-  max-width: 480px; width: 100%; padding: 1.5rem; position: relative;
+  max-width: 480px; width: 100%; padding: 1.8rem; position: relative; box-shadow: var(--shadow-md);
 }
-.modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted); }
-.form-group { margin-bottom: 1rem; }
-.form-group label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem; }
-.form-group input, .form-group select { width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
+.modal-close {
+  position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none;
+  font-size: 1.2rem; cursor: pointer; color: var(--muted); font-weight: bold;
+}
+.form-group { margin-bottom: 1rem; text-align: left; }
+.form-group label { display: block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+.form-group input, .form-group select {
+  width: 100%; padding: 0.65rem 0.9rem; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); font: inherit; font-size: 0.9rem;
+}
 
-footer { text-align: center; margin-top: 3rem; font-size: 0.8rem; color: var(--muted); }
+.badge-card {
+  text-align: center;
+}
+.badge-room {
+  display: inline-block; background: #0f172a; color: #fff;
+  padding: 0.4rem 1.2rem; border-radius: 999px; font-weight: 800; font-size: 1.1rem; margin: 0.8rem 0;
+}
+#qrcode { display: flex; justify-content: center; padding: 0.8rem; background: #fff; border-radius: 12px; border: 1px solid var(--line); width: fit-content; margin: 1rem auto; }
 
-@media (max-width: 600px) {
-  .bangalo-card { grid-template-columns: 1fr; }
+/* Tabela Admin */
+.admin-table-container {
+  max-height: 360px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; margin-top: 1rem;
+}
+.admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+.admin-table th, .admin-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); }
+.admin-table th { background: var(--bg); color: var(--muted); font-size: 0.7rem; text-transform: uppercase; position: sticky; top: 0; }
+
+footer {
+  margin-top: 3.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+footer b { color: var(--ink); }
+
+@media (max-width: 700px) {
+  body { padding: 0.8rem 0.6rem 3rem; }
+  .masthead { padding: 1.5rem 1.2rem; border-radius: 16px; }
+  .bangalo-card {
+    grid-template-columns: 70px 1fr;
+    gap: 0.8rem;
+    padding: 0.8rem 0.9rem;
+  }
+  .cap-badge { grid-column: 2; justify-self: start; margin-top: 0.2rem; }
   .occupants { grid-template-columns: 1fr; }
-  .input-group { flex-direction: column; }
+  .bangalo-num b { font-size: 1.4rem; }
+}
+
+@page { size: A4 portrait; margin: 8mm 8mm; }
+@media print {
+  body { background: #fff; padding: 0; font-size: 8pt; }
+  .control-bar, .stats-grid, footer, .empty-msg, .modal-overlay { display: none !important; }
+  .page { max-width: none; }
+  .masthead {
+    border-radius: 0;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: none;
+    background: #0f172a !important;
+  }
+  .masthead h1 { font-size: 1.2rem; }
+  .chips { display: none; }
+  .wing { margin-top: 0.8rem; }
+  .wing.break-before { break-before: page; page-break-before: always; margin-top: 0; }
+  .wing-header { box-shadow: none; border-radius: 6px; padding: 0.4rem 0.7rem; margin-bottom: 0.4rem; }
+  .bangalo-card {
+    box-shadow: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.65rem;
+    margin-bottom: 0.3rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .bangalo-num { padding: 0.2rem 0; }
+  .bangalo-num b { font-size: 1.2rem; }
+  .occupants { font-size: 7.8pt; row-gap: 0.15rem; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 </head>
 <body>
-
-<!-- Navbar -->
-<nav class="navbar">
-  <div class="nav-container">
-    <div class="brand">🏢 CJAS 2026</div>
-    <div class="nav-links">
-      <button class="nav-btn active" onclick="switchView('home')">🏠 Início</button>
-      <button class="nav-btn" onclick="switchView('bangalos')">🏘 Bangalôs</button>
-      <button class="nav-btn" onclick="switchView('admin')">🔐 Liderança</button>
-      <button class="nav-btn" onclick="toggleDarkMode()">🌙</button>
-    </div>
-  </div>
-</nav>
-
 <div class="page">
 
-  <!-- VISTA 1: HOME (LOGIN DO JOVEM) -->
-  <section id="view-home" class="view-section active">
-    <div class="hero">
-      <h1>Conferência de Jovens Adultos Solteiros</h1>
-      <p>Rio das Garças Eco Resort · 09 a 12 de Outubro de 2026</p>
+  <!-- Header Banner -->
+  <header class="masthead">
+    <span class="kicker">A Igreja de Jesus Cristo dos Santos dos Últimos Dias</span>
+    <h1>Conferência de Jovens Adultos Solteiros — CJAS 2026</h1>
+    <p class="sub">Distribuição oficial de acomodações e quartos</p>
+    <div class="chips">
+      <span class="chip"><span class="dot"></span> Rio das Garças Eco Resort</span>
+      <span class="chip"><span class="dot"></span> 09 a 12 de Outubro de 2026</span>
+      <span class="chip"><span class="dot"></span> 24 Bangalôs Alocados</span>
+    </div>
+  </header>
+
+  <!-- Métricas Rápidas -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="val" id="stat-guests">199</span>
+      <span class="lbl">Total de Hóspedes</span>
+    </div>
+    <div class="stat-card">
+      <span class="val" id="stat-checkins" style="color:var(--ok);">0</span>
+      <span class="lbl">Check-ins Realizados</span>
+    </div>
+    <div class="stat-card">
+      <span class="val">89</span>
+      <span class="lbl">Ala Feminina</span>
+    </div>
+    <div class="stat-card">
+      <span class="val">104</span>
+      <span class="lbl">Ala Masculina</span>
+    </div>
+    <div class="stat-card">
+      <span class="val" style="color:var(--ok);">4</span>
+      <span class="lbl">Vagas Livres (Ala Masc.)</span>
+    </div>
+  </div>
+
+  <!-- Barra de Ferramentas / Busca / Filtros -->
+  <div class="control-bar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input id="q" type="search" placeholder="Buscar participante, cargo ou bangalô…" aria-label="Buscar pessoa ou bangalô">
     </div>
 
-    <!-- Login Rápido do Participante -->
-    <div class="user-login-box" id="login-box-container">
-      <h2>🎟️ Acessar Meu Crachá Digital</h2>
-      <p>Digite seu nome abaixo para ver seu bangalô e gerar seu QR Code de check-in.</p>
-      <form onsubmit="handleParticipantLogin(event)" class="input-group">
-        <input type="text" id="participant-name-input" placeholder="Ex: Liciane Oliveira" required>
-        <button type="submit" class="btn-primary">Ver Crachá</button>
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="casal">Casais</button>
+      <button class="filter-btn" data-filter="fem">Ala Feminina</button>
+      <button class="filter-btn" data-filter="masc">Ala Masculina</button>
+      <button class="filter-btn" data-filter="lead">Liderança</button>
+    </div>
+
+    <button class="filter-btn" onclick="openModal('modal-participant')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="13" y2="12"></line>
+      </svg>
+      Meu QR Code
+    </button>
+
+    <button class="filter-btn" onclick="openAdminArea()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      Liderança
+    </button>
+
+    <button class="btn-print" onclick="window.print()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Imprimir / PDF
+    </button>
+  </div>
+
+  <!-- Conteúdo Renderizado -->
+  <main id="app"></main>
+  <p class="empty-msg" id="empty">Nenhum hóspede ou bangalô corresponde aos termos pesquisados.</p>
+
+  <footer>
+    Distribuição Atualizada · <b>CJAS 2026</b> · Em caso de dúvidas ou alterações, contate a Equipe de Logística
+  </footer>
+</div>
+
+<!-- MODAIS DA APLICAÇÃO -->
+
+<!-- Modal: Crachá Digital do Participante -->
+<div class="modal-overlay" id="modal-participant">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-participant')">✕</button>
+    <div id="participant-search-step">
+      <h3 style="margin-bottom:0.5rem;">Gerar Crachá Digital</h3>
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Digite seu nome completo para visualizar seu bangalô e gerar seu QR Code de check-in.</p>
+      <form onsubmit="handleParticipantSearch(event)">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" id="participant-input-name" placeholder="Ex: Liciane Oliveira" required>
+        </div>
+        <button type="submit" class="btn-print" style="width:100%; justify-content:center;">Visualizar Crachá</button>
       </form>
     </div>
 
-    <!-- Área de Exibição do Crachá (Aparece após logar) -->
-    <div id="participant-badge-container" style="display:none;">
-      <div class="badge-card">
-        <div class="badge-header">Conferência CJAS 2026</div>
-        <div class="badge-name" id="badge-name">---</div>
-        <div class="badge-room" id="badge-room">Bangalô --</div>
-
-        <p style="font-size:0.8rem; color:var(--muted);">Apresente este QR Code na recepção:</p>
-        <div id="qrcode"></div>
-
-        <div style="text-align:left; background:var(--bg); padding:1rem; border-radius:12px; margin-top:1rem;">
-          <small style="font-weight:700; color:var(--muted);">COLEGAS DE QUARTO:</small>
-          <ul id="badge-roommates" style="font-size:0.85rem; margin-top:0.3rem; padding-left:1.2rem;"></ul>
-        </div>
-        <button class="btn-sm" style="margin-top:1rem;" onclick="logoutParticipant()">⬅️ Sair do Crachá</button>
+    <div id="participant-badge-step" style="display:none;" class="badge-card">
+      <span class="kicker" style="background:var(--bg); color:var(--muted); border-color:var(--line);">CJAS 2026 · Crachá Oficial</span>
+      <h2 id="badge-name" style="margin-top:0.4rem; font-size:1.3rem;">---</h2>
+      <div class="badge-room" id="badge-room">Bangalô --</div>
+      <div id="qrcode"></div>
+      <div style="text-align:left; background:var(--bg); padding:0.8rem 1rem; border-radius:10px; border:1px solid var(--line); margin-top:0.8rem;">
+        <small style="font-weight:700; color:var(--muted); text-transform:uppercase;">Colegas de Quarto:</small>
+        <ul id="badge-roommates" style="font-size:0.82rem; margin-top:0.3rem; padding-left:1rem;"></ul>
       </div>
+      <button class="filter-btn" style="margin-top:1rem; width:100%; justify-content:center;" onclick="resetParticipantModal()">Buscar Outro Nome</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Login Admin -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-login')">✕</button>
+    <h3 style="margin-bottom:0.5rem;">Painel da Liderança</h3>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Acesso restrito para controle de check-in e transferências.</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Usuário</label>
+        <input type="text" id="admin-user" value="admincjas" required>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="admin-pass" placeholder="Digite sua senha" required>
+      </div>
+      <button type="submit" class="btn-print" style="width:100%; justify-content:center;">Acessar Painel</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Painel da Liderança / Admin -->
+<div class="modal-overlay" id="modal-admin-panel">
+  <div class="modal" style="max-width: 650px;">
+    <button class="modal-close" onclick="closeModal('modal-admin-panel')">✕</button>
+    <h3 style="margin-bottom:0.2rem;">Gestão de Check-in & Hóspedes</h3>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Marque os check-ins manualmente ou utilize a câmera para escanear os QR Codes.</p>
+    
+    <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
+      <button class="btn-print" onclick="startScanner()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle>
+        </svg>
+        Escanear QR Code
+      </button>
+      <button class="filter-btn" onclick="openModal('modal-change-pass')">Alterar Senha</button>
+      <button class="filter-btn" onclick="logoutAdmin()" style="color:var(--fem);">Sair</button>
     </div>
 
-    <!-- Atalhos Rápidos -->
-    <div class="shortcut-grid">
-      <div class="shortcut-card" onclick="switchView('bangalos')">
-        <div class="icon">🗺️</div>
-        <h3>Ver Bangalôs</h3>
-        <p>Consulte a lista geral dos quartos.</p>
-      </div>
-      <div class="shortcut-card" onclick="openModal('modal-emergency')">
-        <div class="icon">🚑</div>
-        <h3>Saúde & Emergência</h3>
-        <p>Contatos dos médicos e diretoria.</p>
-      </div>
-      <div class="shortcut-card" onclick="switchView('admin')">
-        <div class="icon">📋</div>
-        <h3>Área do Líder</h3>
-        <p>Acesso restrito para check-in por câmera.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- VISTA 2: LISTA DE BANGALÔS -->
-  <section id="view-bangalos" class="view-section">
-    <div class="control-bar">
-      <div class="search-box">
-        <input id="q" type="search" placeholder="Buscar participante ou bangalô…" oninput="renderBangalos()">
-      </div>
-    </div>
-    <main id="bangalos-container"></main>
-  </section>
-
-  <!-- VISTA 3: ADMIN / LIDERANÇA -->
-  <section id="view-admin" class="view-section">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-      <h2>Painel da Liderança</h2>
-      <div style="display:flex; gap:0.4rem;">
-        <button class="btn-primary" onclick="startScanner()">📷 Escanear QR Code</button>
-        <button class="btn-sm" onclick="openModal('modal-pass')">🔑 Senha</button>
-        <button class="btn-sm" onclick="logoutAdmin()" style="color:red;">Sair</button>
-      </div>
-    </div>
-
-    <div class="control-bar">
-      <div class="search-box">
-        <input id="admin-search" type="search" placeholder="Filtrar por nome ou bangalô…" oninput="renderAdminTable()">
-      </div>
-      <div style="font-weight:bold; font-size:0.9rem;" id="checkin-counter">
-        Check-ins: 0 / 199
-      </div>
-    </div>
+    <input id="admin-search-input" type="search" placeholder="Filtrar participante…" oninput="renderAdminTable()" style="width:100%; padding:0.5rem 0.8rem; border-radius:8px; border:1px solid var(--line); font-size:0.85rem;">
 
     <div class="admin-table-container">
       <table class="admin-table">
         <thead>
           <tr>
             <th>Check-in</th>
-            <th>Nome do Hóspede</th>
+            <th>Nome</th>
             <th>Bangalô</th>
             <th>Ações</th>
           </tr>
@@ -470,88 +698,50 @@ footer { text-align: center; margin-top: 3rem; font-size: 0.8rem; color: var(--m
         <tbody id="admin-tbody"></tbody>
       </table>
     </div>
-  </section>
-
-  <footer>
-    <b>CJAS 2026</b> · Sistema Oficial de Gestão
-  </footer>
-</div>
-
-<!-- MODAIS -->
-
-<!-- Modal: Login Admin -->
-<div class="modal-overlay" id="modal-login">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-login')">✕</button>
-    <h2>Acesso da Liderança</h2>
-    <form onsubmit="handleLogin(event)">
-      <div class="form-group">
-        <label>Usuário</label>
-        <input type="text" id="login-user" required value="admincjas">
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" id="login-pass" required placeholder="Digite sua senha">
-      </div>
-      <button type="submit" class="btn-primary" style="width:100%;">Entrar no Painel</button>
-    </form>
   </div>
 </div>
 
-<!-- Modal: Leitor de QR Code -->
+<!-- Modal: Câmera QR Code -->
 <div class="modal-overlay" id="modal-scanner">
   <div class="modal">
     <button class="modal-close" onclick="stopScanner()">✕</button>
-    <h2>Escanear QR Code do Hóspede</h2>
-    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem;">Aponte a câmera do celular para o QR Code no celular do participante:</p>
-    <div id="reader" style="width:100%;"></div>
+    <h3 style="margin-bottom:0.5rem;">Escanear QR Code</h3>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Aponte a câmera para o QR Code no celular do participante:</p>
+    <div id="reader" style="width:100%; border-radius:12px; overflow:hidden;"></div>
   </div>
 </div>
 
-<!-- Modal: Transferência -->
+<!-- Modal: Transferência de Bangalô -->
 <div class="modal-overlay" id="modal-transfer">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-transfer')">✕</button>
-    <h2>Transferir Participante</h2>
-    <p id="transfer-person-name" style="font-weight:bold; margin-bottom:1rem; color:var(--muted);"></p>
+    <h3>Transferir Hóspede</h3>
+    <p id="transfer-person-name" style="font-size:0.85rem; font-weight:bold; color:var(--muted); margin:0.5rem 0 1rem;"></p>
     <div class="form-group">
       <label>Selecione o Novo Bangalô</label>
       <select id="transfer-select-room"></select>
     </div>
-    <button onclick="confirmTransfer()" class="btn-primary" style="width:100%;">Confirmar Transferência</button>
+    <button onclick="confirmTransfer()" class="btn-print" style="width:100%; justify-content:center;">Confirmar Transferência</button>
   </div>
 </div>
 
 <!-- Modal: Alterar Senha -->
-<div class="modal-overlay" id="modal-pass">
+<div class="modal-overlay" id="modal-change-pass">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-pass')">✕</button>
-    <h2>Alterar Senha do Admin</h2>
-    <form onsubmit="handleChangePassword(event)">
+    <button class="modal-close" onclick="closeModal('modal-change-pass')">✕</button>
+    <h3>Alterar Senha de Liderança</h3>
+    <form onsubmit="handleChangePassword(event)" style="margin-top:1rem;">
       <div class="form-group">
         <label>Nova Senha</label>
-        <input type="password" id="new-pass-input" required placeholder="Digite a nova senha">
+        <input type="password" id="new-pass-input" placeholder="Digite a nova senha" required>
       </div>
-      <button type="submit" class="btn-primary" style="width:100%;">Salvar Senha</button>
+      <button type="submit" class="btn-print" style="width:100%; justify-content:center;">Salvar Senha</button>
     </form>
   </div>
 </div>
 
-<!-- Modal: Emergência -->
-<div class="modal-overlay" id="modal-emergency">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-emergency')">✕</button>
-    <h2>Saúde & Emergência</h2>
-    <p style="margin-bottom:1rem; font-size:0.9rem; color:var(--muted);">Entre em contato direto com a equipe de apoio e saúde:</p>
-    <div style="display:flex; flex-direction:column; gap:0.6rem;">
-      <a href="https://wa.me/5584999999999" target="_blank" class="btn-primary" style="text-decoration:none; text-align:center;">💬 Wallyson Francelino (Saúde)</a>
-      <a href="https://wa.me/5584999999999" target="_blank" class="btn-primary" style="text-decoration:none; text-align:center; background:#059669;">💬 Guilherme & Ana (Saúde)</a>
-    </div>
-  </div>
-</div>
-
 <script>
-// 1. Configuração do Firebase com a sua URL da nuvem
+// 1. Conexão Firebase
 const firebaseConfig = {
   databaseURL: "https://cjas-2026-default-rtdb.firebaseio.com/"
 };
@@ -559,83 +749,113 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Dados Iniciais (Backup)
+// Dados Iniciais
 const INITIAL_DATA = [
   {
-    cls: "casal", title: "Bangalôs de Casais (Líderes)", note: "3 bangalôs · 6 hóspedes",
-    groups: [{ rows: [
-      ["02", 2, ["Elany Marcolino & Rutem Marcolino (Casal Diretor)"]],
-      ["03", 2, ["Luciana Jesus & Ordilei Jesus (Casal de Apoio 1)"]],
-      ["04", 2, ["Guilherme Santos & Ana Mayara Santos (Casal de Apoio 2 / Saúde)"]]
-    ]}]
-  },
-  {
-    cls: "fem", title: "Ala Feminina", note: "89 hóspedes",
+    cls: "casal",
+    title: "Bangalôs de Casais (Líderes)",
+    note: "3 bangalôs · 6 hóspedes (100% ocupado)",
     groups: [
-      { name: "Liderança Feminina", isLead: true, rows: [
-        ["05", 8, ["Vaniele Caetano (Coord.)", "Stella de Souza Jesus (Mídia)", "Lara Mirelly (Log.)", "Jade Kerolyng Andrade Da Costa", "Maria Heloísa Costa (Prog.)", "Mariana Teixeira (Prog.)", "Évani Flávia (Prog.)", "Maria Clara Barbalho Monteiro"]],
-        ["06", 8, ["Camille Barbosa B. A. Soares (Mídia)", "Liedyna de Oliveira Lucena (Mídia)", "Cecília Oliveira (TI)", "Maria Anunciação Belo (TI)", "Juliane Gabrielle G. Morais (TI)", "Liciane Oliveira (Log.)", "Anna Karolayne de Castro Simões", "Gislianne da Silva Moura"]]
-      ]},
-      { name: "Participantes Solteiras", rows: [
-        ["01", 8, ["Ana Lúcia Deus Erzinger", "VALDILAINE CRUZ", "Maria Theresa Barbalho Monteiro", "Janny Kattlyng Andrade da Costa", "Raquel Mariângela Cruz do Nascimento", "Jéssica Ernesto Martins", "Luzia Juliana Ferreira dos Anjos", "Antônia Bruna Araújo Dos Santos"]],
-        ["07", 8, ["Jamily Naomi da Silva Lima", "Kimberly Julia Gonzaga da Silva", "Agnės Jasmine Borges Guedes", "Vanessa Oliveira Ibiapina", "Mariane Silva de Araújo", "Ana Beatriz de Souza Vieira", "Laura Silva de Medeiros", "Marta Maia de Sousa"]],
-        ["08", 8, ["Renata do Nascimento", "Maria Luiza Filgueira Gomes de Sousa", "Ana Kelly Cypriano de Oliveira", "Angela Arnaud de Sousa Monteiro da Silva", "Julia Gabrielly Santiago Medeiros", "Rosymeire Egildo da Silva", "Laura Beatriz Tavares de Castro", "Luz María Ludueña"]],
-        ["09", 8, ["Maria José da Conceição Lima", "Marina Aguero", "Vanessa de Souza Targino", "Amanda Huana da Silva Santos", "Heloisa Laura Farias Oliveira", "Jéssica Cecília Amorim Silva", "Julia Elice Peres de França Ribeiro", "Maria Heloysa Santos da Silva"]],
-        ["10", 8, ["Ana Paula da Silva Costa", "Clara Letícia Alcantara Sousa", "Francimara Damasceno da Silva", "Maria Júlia Melo da Silva", "Dayane Patricia da Silva", "Debora Patricia", "Samara Lissandra Pinto Silva", "Jessica Luana Fernandes Pereira"]],
-        ["11", 8, ["Maria Clara Silveira Fernandes", "Rebeca Raabe da Cunha", "Camilly Vitória Gomes da Silva", "Maria Beatriz Bezerra Felipe", "Tamara Emily de Nascimento", "Lilian Cabral Rebouças", "Janayna Santos da Silva", "Maria Eduarda Ramos Fernandes"]],
-        ["12", 8, ["Renata Gabriele Barbosa Batista", "Emily Pereira da Silva", "Iasmim Caroline Davi De Brito", "Leticia Emily Dantas Do Nascimento", "Nathalia Rodrigues Silva", "Sabrina Gomes da Silva", "Ana Carolina Costa Da Silva", "Leila Dalva Dos Santos Nascimento"]],
-        ["13", 8, ["Rhanne Souza", "Gabrielly de Araújo Alexandre", "Vitória Lira da Silva", "Sara María de Lima Souza", "Gisliane Kyvia Monteiro Lima", "Maria Eduarda da Silva Correia", "Sabrina Kamily Macedo Silva", "Samára Erika Bezerra Nunes"]],
-        ["14", 9, ["Yasmim de Lima Bazilio", "Maria Elinete Quirino Dos Santos", "Samira Kathleen", "Débora Letícia Ribeiro dos Santos", "Jamile Medeiros de Araujo", "Marjorie Trigueiro de Oliveira", "Tereza Raquel Dos Santos Carmo", "Davila Medeiros Fernandes Lopes", "Ilane Soares Da Silva"]]
-      ]}
+      {
+        rows: [
+          ["02", 2, "Elany Marcolino & Rutem Marcolino (Casal Diretor)"],
+          ["03", 2, "Luciana Jesus & Ordilei Jesus (Casal de Apoio 1)"],
+          ["04", 2, "Guilherme Santos & Ana Mayara Santos (Casal de Apoio 2 / Saúde)"]
+        ]
+      }
     ]
   },
   {
-    cls: "masc", title: "Ala Masculina", note: "104 hóspedes",
+    cls: "fem",
+    title: "Ala Feminina",
+    note: "89 de 89 vagas ocupadas (100% ocupado)",
     groups: [
-      { name: "Liderança Masculina", isLead: true, rows: [
-        ["15", 8, ["Breno Cesar (Coord.)", "Flávio Silva (Log.)", "Nicolas Daniel Vale dos Santos (Log.)", "Arifran Felix da Cruz (Log.)", "André Linhares (Prog.)", "Jonas Cauã (Prog.)", "Caio César Ataíde Ferreira (Mídia)", "Pedro Henrique Silva do Nascimento (Mídia)"]],
-        ["16", 8, ["Emanuel Victor R. Nascimento (TI)", "Liedson Lima dos Santos (TI)", "Wallyson Francelino (Saúde)", "José Victor Batista Arruda"]]
-      ]},
-      { name: "Participantes Solteiros", rows: [
-        ["17", 8, ["Alan Jeferson de Souza Freitas", "Pedro Wallace Nelo Gomes", "Tiago Henrique da Silva Freitas", "Angelo Moroni de Andrade Lima", "Chrystian Thales Santos da Hora", "Isaque Samuel Silva Assis", "Nicholas Longo Ribeiro", "Carlos Igor dos Santos Braz"]],
-        ["18", 8, ["João Pedro Teixeira Vieira", "Renan Maia de Sousa", "Silvio Mario Cavalcanti Gameiro de Moura Neto", "Christian Mickael da Silva Paula", "Denilson Medeiros da Costa", "Leandro Oliveira", "Luis Henrique Damasceno dos Santos", "Facundo Jesús Argel"]],
-        ["19", 8, ["Juan Pablo da Costa Belo", "Marlon Natan da Silva Felix", "Matheus Gonçalo de Oliveira", "Chagas Lima", "Douglas Luiz Gomes da Cunha", "Fabio Lucas Souza da Silva", "Pedro Gabriel Lima de Melo", "Abner Fernandes Costa"]],
-        ["20", 8, ["Antônio Vagner Bezerra Feitosa", "Fernando Italo Da Silva Mendes", "Gabriel Felinto Rodrigues", "Gerson Peres de Oliveira", "Moroni Torres Lopes de Figueiredo", "Ricardo Miguel Cunha de Azevedo", "Richard Oliveira da Silva", "Ramon Cruz Marcolino"]],
-        ["21", 8, ["Alessandro de Assis Silva", "Jerry Adriano Rodrigues Da Silva", "Jonas Miguel Felix de Souza", "Mikael Roberto de Souza Freitas", "Antônio Eduardo Melo dos Santos", "Marcus Vinícius da Silva", "João Paulo Araújo Lima da Silva", "Vitor Lira da Silva"]],
-        ["22", 8, ["Felipe Silva da Rocha Arnoud", "Gabriel Medeiros Pereira", "Paulo Henrique Ribeiro Dos Santos", "Sammael Ives Chave Freire", "Antonio de Oliveira Pinto", "Kevyn Medeiros Felix", "Levi Araujo Alves de Souza", "Hilton Hugo Da Silva"]],
-        ["29", 7, ["Ryan Kauê De Carvalho Rodrigues", "Vitor Matheus Alves da Trindade", "Daniel Barbosa da Cruz", "José Ricardo do Nascimento", "Kleyton Silva dos Santos", "Ygor Leonardo Alves Nogueira", "Aryon Daniel Ferreira da Silva"]],
-        ["30", 7, ["Pedro Henrique Alves Pereira Da Silva", "Gabriel Araújo", "Luigi Bounocore de Lima", "Matheus Erik Silva Lima", "Vitor Oliveira das Neves", "Anderson Sales Beserra", "Guilherme Basilio da Silva"]],
-        ["31", 7, ["Luis Henrique Soares Ferreira da Silva", "Alexandre Clemente Ferreira", "Daniel Dos Santos Gadelha", "Francisco Eliezer Fernandes Tomaz", "Gilderlay Dantas Da Costa", "Jordan Ellias de Sena Moreira Pereira", "Moroni Esdras Maria Araujo"]],
-        ["32", 7, ["Tiago Tayrone Silva de Medeiros Targino Filho", "Victor Hugo Da Silva", "Saulo Nunes Alves", "Francisco Hélio Costa", "Gabriel Giovanni da Silva", "Salustiano Faustino de Oliveira", "Admilson Dino jr Silva"]],
-        ["33", 8, ["Daniel Gomes Da Rocha", "Francisco Leaci de Paiva Gomes Junior", "João Henrique Silva Dantas Damasceno", "João Victor de Freitas Morais", "Victor Emanoel Leite da Silva", "Vinicius Emanoel Leite da Silva", "Wesley Wagner Maia Varela", "Marcos Antônio Melo de Morais"]],
-        ["34", 8, ["Maycon Augusto De Melo Morais", "Jadson Bezerra do Nascimento Jacome", "Johan Alexis Valencia Morcillo", "Robson Samuel Nunes de Maria", "Eduardo Alexandre dos Santos Pontes", "Gabriel Dias Silva", "João Victor Martins de França", "Wendell Gabriel Romão da Silva"]]
-      ]}
+      {
+        name: "Liderança Feminina",
+        isLead: true,
+        rows: [
+          ["05", 8, "Vaniele Caetano (Coord.), Stella de Souza Jesus (Mídia), Lara Mirelly (Log.), Jade Kerolyng Andrade Da Costa, Maria Heloísa Costa (Prog.), Mariana Teixeira (Prog.), Évani Flávia (Prog.), Maria Clara Barbalho Monteiro"],
+          ["06", 8, "Camille Barbosa B. A. Soares (Mídia), Liedyna de Oliveira Lucena (Mídia), Cecília Oliveira (TI), Maria Anunciação Belo (TI), Juliane Gabrielle G. Morais (TI), Liciane Oliveira (Log.), Anna Karolayne de Castro Simões, Gislianne da Silva Moura"]
+        ]
+      },
+      {
+        name: "Participantes Solteiras",
+        rows: [
+          ["01", 8, "Ana Lúcia Deus Erzinger, VALDILAINE CRUZ, Maria Theresa Barbalho Monteiro, Janny Kattlyng Andrade da Costa, Raquel Mariângela Cruz do Nascimento, Jéssica Ernesto Martins, Luzia Juliana Ferreira dos Anjos, Antônia Bruna Araújo Dos Santos"],
+          ["07", 8, "Jamily Naomi da Silva Lima, Kimberly Julia Gonzaga da Silva, Agnės Jasmine Borges Guedes, Vanessa Oliveira Ibiapina, Mariane Silva de Araújo, Ana Beatriz de Souza Vieira, Laura Silva de Medeiros, Marta Maia de Sousa"],
+          ["08", 8, "Renata do Nascimento, Maria Luiza Filgueira Gomes de Sousa, Ana Kelly Cypriano de Oliveira, Angela Arnaud de Sousa Monteiro da Silva, Julia Gabrielly Santiago Medeiros, Rosymeire Egildo da Silva, Laura Beatriz Tavares de Castro, Luz María Ludueña"],
+          ["09", 8, "Maria José da Conceição Lima, Marina Aguero, Vanessa de Souza Targino, Amanda Huana da Silva Santos, Heloisa Laura Farias Oliveira, Jéssica Cecília Amorim Silva, Julia Elice Peres de França Ribeiro, Maria Heloysa Santos da Silva"],
+          ["10", 8, "Ana Paula da Silva Costa, Clara Letícia Alcantara Sousa, Francimara Damasceno da Silva, Maria Júlia Melo da Silva, Dayane Patricia da Silva, Debora Patricia, Samara Lissandra Pinto Silva, Jessica Luana Fernandes Pereira"],
+          ["11", 8, "Maria Clara Silveira Fernandes, Rebeca Raabe da Cunha, Camilly Vitória Gomes da Silva, Maria Beatriz Bezerra Felipe, Tamara Emily de Nascimento, Lilian Cabral Rebouças, Janayna Santos da Silva, Maria Eduarda Ramos Fernandes"],
+          ["12", 8, "Renata Gabriele Barbosa Batista, Emily Pereira da Silva, Iasmim Caroline Davi De Brito, Leticia Emily Dantas Do Nascimento, Nathalia Rodrigues Silva, Sabrina Gomes da Silva, Ana Carolina Costa Da Silva, Leila Dalva Dos Santos Nascimento"],
+          ["13", 8, "Rhanne Souza, Gabrielly de Araújo Alexandre, Vitória Lira da Silva, Sara María de Lima Souza, Gisliane Kyvia Monteiro Lima, Maria Eduarda da Silva Correia, Sabrina Kamily Macedo Silva, Samára Erika Bezerra Nunes"],
+          ["14", 9, "Yasmim de Lima Bazilio, Maria Elinete Quirino Dos Santos, Samira Kathleen, Débora Letícia Ribeiro dos Santos, Jamile Medeiros de Araujo, Marjorie Trigueiro de Oliveira, Tereza Raquel Dos Santos Carmo, Davila Medeiros Fernandes Lopes, Ilane Soares Da Silva"]
+        ]
+      }
+    ]
+  },
+  {
+    cls: "masc",
+    title: "Ala Masculina",
+    note: "104 de 108 vagas ocupadas · 4 vagas livres no bangalô 16",
+    brk: true,
+    groups: [
+      {
+        name: "Liderança Masculina",
+        isLead: true,
+        rows: [
+          ["15", 8, "Breno Cesar (Coord.), Flávio Silva (Log.), Nicolas Daniel Vale dos Santos (Log.), Arifran Felix da Cruz (Log.), André Linhares (Prog.), Jonas Cauã (Prog.), Caio César Ataíde Ferreira (Mídia), Pedro Henrique Silva do Nascimento (Mídia)"],
+          ["16", 8, "Emanuel Victor R. Nascimento (TI), Liedson Lima dos Santos (TI), Wallyson Francelino (Saúde), José Victor Batista Arruda"]
+        ]
+      },
+      {
+        name: "Participantes Solteiros",
+        rows: [
+          ["17", 8, "Alan Jeferson de Souza Freitas, Pedro Wallace Nelo Gomes, Tiago Henrique da Silva Freitas, Angelo Moroni de Andrade Lima, Chrystian Thales Santos da Hora, Isaque Samuel Silva Assis, Nicholas Longo Ribeiro, Carlos Igor dos Santos Braz"],
+          ["18", 8, "João Pedro Teixeira Vieira, Renan Maia de Sousa, Silvio Mario Cavalcanti Gameiro de Moura Neto, Christian Mickael da Silva Paula, Denilson Medeiros da Costa, Leandro Oliveira, Luis Henrique Damasceno dos Santos, Facundo Jesús Argel"],
+          ["19", 8, "Juan Pablo da Costa Belo, Marlon Natan da Silva Felix, Matheus Gonçalo de Oliveira, Chagas Lima, Douglas Luiz Gomes da Cunha, Fabio Lucas Souza da Silva, Pedro Gabriel Lima de Melo, Abner Fernandes Costa"],
+          ["20", 8, "Antônio Vagner Bezerra Feitosa, Fernando Italo Da Silva Mendes, Gabriel Felinto Rodrigues, Gerson Peres de Oliveira, Moroni Torres Lopes de Figueiredo, Ricardo Miguel Cunha de Azevedo, Richard Oliveira da Silva, Ramon Cruz Marcolino"],
+          ["21", 8, "Alessandro de Assis Silva, Jerry Adriano Rodrigues Da Silva, Jonas Miguel Felix de Souza, Mikael Roberto de Souza Freitas, Antônio Eduardo Melo dos Santos, Marcus Vinícius da Silva, João Paulo Araújo Lima da Silva, Vitor Lira da Silva"],
+          ["22", 8, "Felipe Silva da Rocha Arnoud, Gabriel Medeiros Pereira, Paulo Henrique Ribeiro Dos Santos, Sammael Ives Chave Freire, Antonio de Oliveira Pinto, Kevyn Medeiros Felix, Levi Araujo Alves de Souza, Hilton Hugo Da Silva"],
+          ["29", 7, "Ryan Kauê De Carvalho Rodrigues, Vitor Matheus Alves da Trindade, Daniel Barbosa da Cruz, José Ricardo do Nascimento, Kleyton Silva dos Santos, Ygor Leonardo Alves Nogueira, Aryon Daniel Ferreira da Silva"],
+          ["30", 7, "Pedro Henrique Alves Pereira Da Silva, Gabriel Araújo, Luigi Bounocore de Lima, Matheus Erik Silva Lima, Vitor Oliveira das Neves, Anderson Sales Beserra, Guilherme Basilio da Silva"],
+          ["31", 7, "Luis Henrique Soares Ferreira da Silva, Alexandre Clemente Ferreira, Daniel Dos Santos Gadelha, Francisco Eliezer Fernandes Tomaz, Gilderlay Dantas Da Costa, Jordan Ellias de Sena Moreira Pereira, Moroni Esdras Maria Araujo"],
+          ["32", 7, "Tiago Tayrone Silva de Medeiros Targino Filho, Victor Hugo Da Silva, Saulo Nunes Alves, Francisco Hélio Costa, Gabriel Giovanni da Silva, Salustiano Faustino de Oliveira, Admilson Dino jr Silva"],
+          ["33", 8, "Daniel Gomes Da Rocha, Francisco Leaci de Paiva Gomes Junior, João Henrique Silva Dantas Damasceno, João Victor de Freitas Morais, Victor Emanoel Leite da Silva, Vinicius Emanoel Leite da Silva, Wesley Wagner Maia Varela, Marcos Antônio Melo de Morais"],
+          ["34", 8, "Maycon Augusto De Melo Morais, Jadson Bezerra do Nascimento Jacome, Johan Alexis Valencia Morcillo, Robson Samuel Nunes de Maria, Eduardo Alexandre dos Santos Pontes, Gabriel Dias Silva, João Victor Martins de França, Wendell Gabriel Romão da Silva"]
+        ]
+      }
     ]
   }
 ];
 
-// Estado Global
-let dataState = INITIAL_DATA;
+// Estado da Aplicação
+let currentData = INITIAL_DATA;
 let checkins = {};
 let adminPass = 'cjas2026';
 let isLoggedIn = sessionStorage.getItem('cjas_logged') === 'true';
-let loggedParticipant = sessionStorage.getItem('cjas_participant') || null;
+let personToTransfer = null;
 let html5QrcodeScanner = null;
 
 const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const el = (t, c, x) => {
+  const e = document.createElement(t);
+  if (c) e.className = c;
+  if (x != null) e.textContent = x;
+  return e;
+};
 
-// Sincronização Firebase Realtime
+// Sincronização em Tempo Real (Firebase)
 db.ref('cjas_data').on('value', snapshot => {
-  if (snapshot.val()) dataState = snapshot.val();
+  if (snapshot.val()) currentData = snapshot.val();
   else db.ref('cjas_data').set(INITIAL_DATA);
-  renderBangalos();
+  renderApp();
   if (isLoggedIn) renderAdminTable();
-  if (loggedParticipant) displayBadge(loggedParticipant);
 });
 
 db.ref('cjas_checkins').on('value', snapshot => {
   checkins = snapshot.val() || {};
-  renderBangalos();
+  renderApp();
   if (isLoggedIn) renderAdminTable();
   updateKPIs();
 });
@@ -645,143 +865,275 @@ db.ref('cjas_pass').on('value', snapshot => {
 });
 
 function updateKPIs() {
-  const count = Object.values(checkins).filter(Boolean).length;
-  const counterEl = document.getElementById('checkin-counter');
-  if (counterEl) counterEl.textContent = `Check-ins: ${count} / 199`;
-}
-
-function switchView(v) {
-  if (v === 'admin' && !isLoggedIn) { openModal('modal-login'); return; }
-  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`view-${v}`).classList.add('active');
-  if (v === 'bangalos') renderBangalos();
-  if (v === 'admin') renderAdminTable();
+  const totalChecked = Object.values(checkins).filter(Boolean).length;
+  document.getElementById('stat-checkins').textContent = totalChecked;
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-function toggleDarkMode() { document.body.classList.toggle('dark'); }
 
-/* LOGIN & CRACHÁ DO PARTICIPANTE */
-function handleParticipantLogin(e) {
-  e.preventDefault();
-  const nameInput = document.getElementById('participant-name-input').value.trim();
-  const matched = findPerson(nameInput);
+function formatPersonLi(txt) {
+  const li = el("li");
+  const m = txt.match(/^(.*?)\s*\(([^)]+)\)$/);
+  const name = m ? m[1] : txt;
+  const role = m ? m[2] : null;
 
-  if (matched) {
-    loggedParticipant = matched.person;
-    sessionStorage.setItem('cjas_participant', matched.person);
-    displayBadge(matched.person);
-  } else {
-    alert('Participante não encontrado! Verifique a grafia do seu nome.');
+  li.dataset.raw = norm(name + (role ? " " + role : ""));
+  li.append(document.createTextNode(name));
+
+  if (role) {
+    li.append(el("span", "role-badge", role));
   }
+  if (checkins[name]) {
+    li.append(el("span", "check-tag", "Check-in"));
+  }
+  return li;
 }
 
-function findPerson(query) {
-  const q = norm(query);
-  let result = null;
-  dataState.forEach(sec => {
+function renderBangaloCard(sec, group, [id, cap, raw]) {
+  const isCasal = sec.cls === "casal";
+  let names = [], role = null;
+
+  if (isCasal) {
+    const m = raw.match(/^(.*)\s\(([^)]+)\)$/);
+    names = m[1].split(" & ");
+    role = m[2];
+  } else {
+    names = typeof raw === "string" ? raw.split(", ") : raw;
+  }
+
+  const card = el("div", `bangalo-card ${sec.cls}`);
+  card.dataset.id = id;
+  card.dataset.cls = sec.cls;
+  card.dataset.isLead = group.isLead || isCasal ? "true" : "false";
+  card.dataset.search = norm(`bangalo ${id} ${names.join(" ")} ${role || ''}`);
+
+  const numBox = el("div", "bangalo-num");
+  numBox.append(el("small", null, "Bangalô"), el("b", null, id));
+
+  const ul = el("ul", "occupants");
+  names.forEach(p => ul.append(formatPersonLi(p)));
+
+  if (role) {
+    const li = el("li");
+    li.append(el("span", "role-badge", role));
+    ul.append(li);
+  }
+
+  const free = cap - names.length;
+  let capBadge;
+  if (isCasal || free === 0) {
+    capBadge = el("div", "cap-badge full", `${names.length} de ${cap} · Completo`);
+  } else {
+    capBadge = el("div", "cap-badge free", `${names.length} de ${cap} · ${free} ${free === 1 ? 'vaga livre' : 'vagas livres'}`);
+  }
+
+  card.append(numBox, ul, capBadge);
+  return card;
+}
+
+function renderApp() {
+  const app = document.getElementById("app");
+  if (!app) return;
+  app.innerHTML = '';
+
+  currentData.forEach(sec => {
+    const wing = el("section", `wing ${sec.cls}${sec.brk ? " break-before" : ""}`);
+    wing.dataset.cls = sec.cls;
+
+    const header = el("div", "wing-header");
+    const titleBox = el("div", "wing-title");
+    titleBox.append(el("h2", null, sec.title), el("span", "note", sec.note));
+    header.append(titleBox);
+
+    let totalBeds = 0;
+    sec.groups.forEach(g => g.rows.forEach(([id, cap]) => totalBeds += cap));
+    header.append(el("span", "wing-badge", `${totalBeds} leitos totais`));
+    wing.append(header);
+
     sec.groups.forEach(g => {
-      g.rows.forEach(([id, cap, occupants]) => {
-        occupants.forEach(p => {
-          if (norm(p).includes(q)) {
-            result = { person: p, room: id, roommates: occupants };
+      const groupDiv = el("div", "group-container");
+      groupDiv.dataset.isLead = g.isLead || sec.cls === "casal" ? "true" : "false";
+
+      if (g.name) {
+        groupDiv.append(el("div", "subgroup-title", g.name));
+      }
+      g.rows.forEach(rw => groupDiv.append(renderBangaloCard(sec, g, rw)));
+      wing.append(groupDiv);
+    });
+
+    app.append(wing);
+  });
+
+  filterCards();
+}
+
+const q = document.getElementById("q");
+const emptyMsg = document.getElementById("empty");
+let currentFilter = "all";
+
+function filterCards() {
+  const term = norm(q.value.trim());
+  let visibleCount = 0;
+
+  document.querySelectorAll(".bangalo-card").forEach(card => {
+    const matchSearch = !term || card.dataset.search.includes(term);
+    let matchCategory = true;
+
+    if (currentFilter === "casal") matchCategory = card.dataset.cls === "casal";
+    else if (currentFilter === "fem") matchCategory = card.dataset.cls === "fem";
+    else if (currentFilter === "masc") matchCategory = card.dataset.cls === "masc";
+    else if (currentFilter === "lead") matchCategory = card.dataset.isLead === "true";
+
+    const isVisible = matchSearch && matchCategory;
+    card.style.display = isVisible ? "" : "none";
+    if (isVisible) visibleCount++;
+
+    card.querySelectorAll(".occupants li").forEach(li => {
+      const isHit = term.length > 1 && li.dataset.raw && li.dataset.raw.includes(term);
+      li.classList.toggle("hit", isHit);
+    });
+  });
+
+  document.querySelectorAll(".group-container").forEach(g => {
+    const hasVisible = [...g.querySelectorAll(".bangalo-card")].some(c => c.style.display !== "none");
+    g.style.display = hasVisible ? "" : "none";
+  });
+
+  document.querySelectorAll(".wing").forEach(w => {
+    const hasVisible = [...w.querySelectorAll(".bangalo-card")].some(c => c.style.display !== "none");
+    w.style.display = hasVisible ? "" : "none";
+  });
+
+  emptyMsg.style.display = visibleCount === 0 ? "block" : "none";
+}
+
+q.addEventListener("input", filterCards);
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (!btn.dataset.filter) return;
+    document.querySelectorAll(".filter-btn").forEach(b => {
+      if (b.dataset.filter) b.classList.remove("active");
+    });
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    filterCards();
+  });
+});
+
+/* CRACHÁ DO PARTICIPANTE */
+function findPerson(query) {
+  const term = norm(query);
+  let found = null;
+
+  currentData.forEach(sec => {
+    sec.groups.forEach(g => {
+      g.rows.forEach(([id, cap, raw]) => {
+        let names = typeof raw === "string" ? raw.split(", ") : raw;
+        if (sec.cls === "casal") {
+          const m = raw.match(/^(.*)\s\(([^)]+)\)$/);
+          if (m) names = m[1].split(" & ");
+        }
+        names.forEach(p => {
+          const cleanName = p.replace(/\s*\([^)]+\)/g, "");
+          if (norm(cleanName).includes(term) || norm(p).includes(term)) {
+            found = { person: cleanName, room: id, roommates: names };
           }
         });
       });
     });
   });
-  return result;
+  return found;
 }
 
-function displayBadge(personName) {
-  const pData = findPerson(personName);
-  if (!pData) return;
+function handleParticipantSearch(e) {
+  e.preventDefault();
+  const query = document.getElementById('participant-input-name').value.trim();
+  const match = findPerson(query);
 
-  document.getElementById('login-box-container').style.display = 'none';
-  document.getElementById('participant-badge-container').style.display = 'block';
+  if (match) {
+    document.getElementById('participant-search-step').style.display = 'none';
+    document.getElementById('participant-badge-step').style.display = 'block';
 
-  document.getElementById('badge-name').textContent = pData.person;
-  document.getElementById('badge-room').textContent = `Bangalô Nº ${pData.room}`;
-  
-  const roommatesList = document.getElementById('badge-roommates');
-  roommatesList.innerHTML = pData.roommates
-    .filter(m => m !== pData.person)
-    .map(m => `<li>${m}</li>`).join('');
+    document.getElementById('badge-name').textContent = match.person;
+    document.getElementById('badge-room').textContent = `Bangalô Nº ${match.room}`;
 
-  // Gerar QR Code
-  const qrContainer = document.getElementById('qrcode');
-  qrContainer.innerHTML = '';
-  new QRCode(qrContainer, {
-    text: pData.person,
-    width: 160,
-    height: 160
-  });
+    const roommatesUl = document.getElementById('badge-roommates');
+    roommatesUl.innerHTML = match.roommates
+      .filter(m => !m.includes(match.person))
+      .map(m => `<li>${m}</li>`).join('');
+
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, { text: match.person, width: 150, height: 150 });
+  } else {
+    alert('Participante não encontrado! Tente buscar apenas pelo primeiro nome.');
+  }
 }
 
-function logoutParticipant() {
-  loggedParticipant = null;
-  sessionStorage.removeItem('cjas_participant');
-  document.getElementById('login-box-container').style.display = 'block';
-  document.getElementById('participant-badge-container').style.display = 'none';
+function resetParticipantModal() {
+  document.getElementById('participant-search-step').style.display = 'block';
+  document.getElementById('participant-badge-step').style.display = 'none';
+  document.getElementById('participant-input-name').value = '';
 }
 
-/* RENDERIZAÇÃO GERAL */
-function renderBangalos() {
-  const container = document.getElementById('bangalos-container');
-  if (!container) return;
-  container.innerHTML = '';
-  const term = norm(document.getElementById('q').value.trim());
+/* ÁREA DA LIDERANÇA / ADMIN */
+function openAdminArea() {
+  if (isLoggedIn) openModal('modal-admin-panel');
+  else openModal('modal-login');
+}
 
-  dataState.forEach(sec => {
-    const wing = document.createElement('div');
-    wing.className = `wing ${sec.cls}`;
-    let wingHTML = `<div class="wing-header"><h2>${sec.title}</h2><small>${sec.note}</small></div>`;
-    
-    sec.groups.forEach(g => {
-      if (g.name) wingHTML += `<div class="subgroup-title">${g.name}</div>`;
-      g.rows.forEach(([id, cap, occupants]) => {
-        const matches = !term || occupants.some(p => norm(p).includes(term)) || norm(id).includes(term);
-        if (!matches) return;
+function handleAdminLogin(e) {
+  e.preventDefault();
+  const u = document.getElementById('admin-user').value;
+  const p = document.getElementById('admin-pass').value;
 
-        wingHTML += `
-          <div class="bangalo-card ${sec.cls}">
-            <div class="bangalo-num"><small>Bangalô</small><b>${id}</b></div>
-            <ul class="occupants">
-              ${occupants.map(p => `<li class="${checkins[p] ? 'checked-in' : ''}">${p}</li>`).join('')}
-            </ul>
-            <div style="font-size:0.75rem; font-weight:bold; color:var(--muted);">${occupants.length}/${cap}</div>
-          </div>
-        `;
-      });
-    });
-    wing.innerHTML = wingHTML;
-    container.appendChild(wing);
-  });
+  if (u === 'admincjas' && p === adminPass) {
+    isLoggedIn = true;
+    sessionStorage.setItem('cjas_logged', 'true');
+    closeModal('modal-login');
+    openModal('modal-admin-panel');
+    renderAdminTable();
+  } else {
+    alert('Usuário ou senha incorretos!');
+  }
+}
+
+function logoutAdmin() {
+  isLoggedIn = false;
+  sessionStorage.removeItem('cjas_logged');
+  closeModal('modal-admin-panel');
 }
 
 function renderAdminTable() {
   const tbody = document.getElementById('admin-tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  const term = norm(document.getElementById('admin-search').value.trim());
+  const term = norm(document.getElementById('admin-search-input').value.trim());
 
-  dataState.forEach(sec => {
+  currentData.forEach(sec => {
     sec.groups.forEach(g => {
-      g.rows.forEach(([id, cap, occupants]) => {
-        occupants.forEach(person => {
-          if (term && !norm(person).includes(term) && !norm(id).includes(term)) return;
+      g.rows.forEach(([id, cap, raw]) => {
+        let names = typeof raw === "string" ? raw.split(", ") : raw;
+        if (sec.cls === "casal") {
+          const m = raw.match(/^(.*)\s\(([^)]+)\)$/);
+          if (m) names = m[1].split(" & ");
+        }
 
-          const tr = document.createElement('tr');
+        names.forEach(person => {
+          const cleanName = person.replace(/\s*\([^)]+\)/g, "");
+          if (term && !norm(cleanName).includes(term) && !norm(id).includes(term)) return;
+
+          const tr = el('tr');
           tr.innerHTML = `
             <td>
-              <input type="checkbox" ${checkins[person] ? 'checked' : ''} onchange="toggleCheckin('${person}', this.checked)">
+              <input type="checkbox" ${checkins[cleanName] ? 'checked' : ''} onchange="toggleCheckin('${cleanName}', this.checked)">
             </td>
-            <td><b>${person}</b></td>
+            <td><b>${cleanName}</b></td>
             <td>Bangalô ${id}</td>
             <td>
-              <button class="btn-sm" onclick="openTransferModal('${person}', '${id}')">🔄 Transferir</button>
+              <button class="filter-btn" style="padding:0.2rem 0.5rem; font-size:0.72rem;" onclick="openTransferModal('${cleanName}', '${id}')">Transferir</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -798,22 +1150,20 @@ function toggleCheckin(person, isChecked) {
 /* LEITOR DE QR CODE VIA CÂMERA */
 function startScanner() {
   openModal('modal-scanner');
-  html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 220, height: 220 } }, false);
-  html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 200, height: 200 } }, false);
+  html5QrcodeScanner.render(onScanSuccess, () => {});
 }
 
 function onScanSuccess(decodedText) {
-  const matched = findPerson(decodedText);
-  if (matched) {
-    toggleCheckin(matched.person, true);
-    alert(`✅ CHECK-IN REALIZADO!\n\nParticipante: ${matched.person}\nBangalô: ${matched.room}`);
+  const match = findPerson(decodedText);
+  if (match) {
+    toggleCheckin(match.person, true);
+    alert(`CHECK-IN CONFIRMADO!\n\nHóspede: ${match.person}\nBangalô: ${match.room}`);
   } else {
-    alert(`⚠️ QR Code Lido: "${decodedText}"\nNenhum participante correspondente foi encontrado.`);
+    alert(`QR Code lido: "${decodedText}"\nNenhum participante correspondente foi encontrado.`);
   }
   stopScanner();
 }
-
-function onScanFailure(error) { /* Silencioso para busca contínua */ }
 
 function stopScanner() {
   if (html5QrcodeScanner) {
@@ -822,42 +1172,20 @@ function stopScanner() {
   closeModal('modal-scanner');
 }
 
-/* LOGIN ADMIN & TRANSFERÊNCIAS */
-function handleLogin(e) {
-  e.preventDefault();
-  if (document.getElementById('login-user').value === 'admincjas' && document.getElementById('login-pass').value === adminPass) {
-    isLoggedIn = true;
-    sessionStorage.setItem('cjas_logged', 'true');
-    closeModal('modal-login');
-    switchView('admin');
-  } else alert('Login incorreto!');
-}
-
-function logoutAdmin() {
-  isLoggedIn = false;
-  sessionStorage.removeItem('cjas_logged');
-  switchView('home');
-}
-
-function handleChangePassword(e) {
-  e.preventDefault();
-  db.ref('cjas_pass').set(document.getElementById('new-pass-input').value);
-  alert('Senha salva na nuvem!');
-  closeModal('modal-pass');
-}
-
+/* TRANSFERÊNCIA E SENHA */
 function openTransferModal(person, currentRoom) {
   personToTransfer = { person, currentRoom };
-  document.getElementById('transfer-person-name').textContent = `${person} (Bangalô ${currentRoom})`;
+  document.getElementById('transfer-person-name').textContent = `${person} (Atualmente no Bangalô ${currentRoom})`;
   const select = document.getElementById('transfer-select-room');
   select.innerHTML = '';
 
-  dataState.forEach(sec => {
+  currentData.forEach(sec => {
     sec.groups.forEach(g => {
-      g.rows.forEach(([id, cap, occupants]) => {
+      g.rows.forEach(([id, cap, raw]) => {
+        let names = typeof raw === "string" ? raw.split(", ") : raw;
         const option = document.createElement('option');
         option.value = id;
-        option.textContent = `Bangalô ${id} (${occupants.length}/${cap})`;
+        option.textContent = `Bangalô ${id} (${names.length}/${cap})`;
         if (id === currentRoom) option.selected = true;
         select.appendChild(option);
       });
@@ -868,24 +1196,39 @@ function openTransferModal(person, currentRoom) {
 
 function confirmTransfer() {
   const newRoomId = document.getElementById('transfer-select-room').value;
-  if (!personToTransfer || newRoomId === personToTransfer.currentRoom) { closeModal('modal-transfer'); return; }
+  if (!personToTransfer || newRoomId === personToTransfer.currentRoom) {
+    closeModal('modal-transfer');
+    return;
+  }
 
-  dataState.forEach(sec => {
+  currentData.forEach(sec => {
     sec.groups.forEach(g => {
       g.rows.forEach(row => {
-        if (row[0] === personToTransfer.currentRoom) row[2] = row[2].filter(p => p !== personToTransfer.person);
-        if (row[0] === newRoomId) row[2].push(personToTransfer.person);
+        let names = typeof row[2] === "string" ? row[2].split(", ") : row[2];
+        if (row[0] === personToTransfer.currentRoom) {
+          names = names.filter(p => !p.includes(personToTransfer.person));
+          row[2] = names.join(", ");
+        }
+        if (row[0] === newRoomId) {
+          names.push(personToTransfer.person);
+          row[2] = names.join(", ");
+        }
       });
     });
   });
 
-  db.ref('cjas_data').set(dataState);
+  db.ref('cjas_data').set(currentData);
   closeModal('modal-transfer');
-  alert('Transferência realizada com sucesso!');
+  alert(`Transferência de ${personToTransfer.person} salva na nuvem!`);
 }
 
-// Auto-carregar crachá se já estiver logado
-if (loggedParticipant) displayBadge(loggedParticipant);
+function handleChangePassword(e) {
+  e.preventDefault();
+  const newP = document.getElementById('new-pass-input').value;
+  db.ref('cjas_pass').set(newP);
+  alert('Nova senha salva com sucesso!');
+  closeModal('modal-change-pass');
+}
 </script>
 </body>
 </html>
