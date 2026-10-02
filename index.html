@@ -362,7 +362,7 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     if(t&&!norm(p.name).includes(t)&&!norm(p.r.id).includes(t))return;
     const tr=mk("tr"),a=mk("td"),b=mk("td",null,"Bangalô "+p.r.id),d=mk("td"),ac=mk("td");
     a.append(mk("b",null,p.name));
-    const inp=mk("input");inp.value=getDoc(p.name);inp.placeholder="RG ou CPF";inp.setAttribute("aria-label","Documento de "+p.name);d.append(inp);
+    const inp=mk("input");inp.value=getDoc(p.name);inp.placeholder="RG";inp.setAttribute("aria-label","Documento de "+p.name);d.append(inp);
     const s=mk("button","btn btn-p btn-sm","Salvar");s.onclick=()=>{db.ref("cjas_docs/"+key(p.name)).set(inp.value.trim());toast("Documento salvo.")};
     const m=mk("button","btn btn-s btn-sm","Mudar");m.onclick=()=>transfer(p);
     const x=mk("button","btn btn-d btn-sm","Excluir");x.onclick=()=>removePerson(p);
