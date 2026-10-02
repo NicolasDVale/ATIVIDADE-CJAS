@@ -1059,18 +1059,18 @@ function getAllNames() {
 }
 
 // Lógica Autocompletar Dinâmico nas Buscas
-function setupAutocomplete(inputId, suggestionsId, onSelectCallback) {
+function setupAutocomplete(inputId, suggestionsId, onSelectCallback, onInputCallback) {
   const input = document.getElementById(inputId);
   const suggestionsList = document.getElementById(suggestionsId);
   if (!input || !suggestionsList) return;
 
   input.addEventListener('input', function() {
-    const query = this.value.trim().toLowerCase();
+    const query = this.value.trim();
     suggestionsList.innerHTML = '';
 
     if (!query) {
       suggestionsList.style.display = 'none';
-      if (onSelectCallback) onSelectCallback('');
+      if (onInputCallback) onInputCallback('');
       return;
     }
 
@@ -1081,7 +1081,8 @@ function setupAutocomplete(inputId, suggestionsId, onSelectCallback) {
       matches.slice(0, 8).forEach(name => {
         const li = document.createElement('li');
         li.textContent = name;
-        li.addEventListener('click', () => {
+        li.addEventListener('click', (e) => {
+          e.stopPropagation();
           input.value = name;
           suggestionsList.style.display = 'none';
           if (onSelectCallback) onSelectCallback(name);
@@ -1093,18 +1094,22 @@ function setupAutocomplete(inputId, suggestionsId, onSelectCallback) {
       suggestionsList.style.display = 'none';
     }
 
-    if (onSelectCallback) onSelectCallback(query);
+    if (onInputCallback) onInputCallback(query);
   });
 }
 
-// Configura Autocompletar da Página Inicial e da Tabela Principal
-setupAutocomplete('home-name-input', 'home-suggestions', (name) => {
-  if (name && name.length > 2) handleHomeSearch();
+// Configura Autocompletar da Página Inicial (Dispara busca apenas ao CLICAR na sugestão)
+setupAutocomplete('home-name-input', 'home-suggestions', (selectedName) => {
+  handleHomeSearch();
 });
 
-setupAutocomplete('q', 'main-suggestions', (query) => {
-  filterCards();
-});
+// Configura Autocompletar da Tela de Lista Completa (Filtra enquanto digita e ao clicar)
+setupAutocomplete(
+  'q', 
+  'main-suggestions', 
+  (selectedName) => { filterCards(); }, 
+  (query) => { filterCards(); }
+);
 
 // Ocultar menus de sugestões ao clicar fora
 document.addEventListener('click', function(e) {
