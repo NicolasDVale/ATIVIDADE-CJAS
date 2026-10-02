@@ -244,9 +244,10 @@ const db=firebase.database();
 let data=INITIAL_DATA, docs={}, adminPass="cjas2026", logged=sessionStorage.getItem("cjas_logged")==="1", filter="all";
 
 function rooms(){const out=[];toArr(data).forEach(sec=>toArr(sec.groups).forEach(g=>toArr(g.rows).forEach(row=>{
-  if(!row)return;const casal=sec.cls==="casal";let raw=String(row[2]||""),role="";
+  if(!row)return;const casal=sec.cls==="casal";
+  let raw=row[2]&&typeof row[2]==="object"?toArr(row[2]).join(", "):String(row[2]||""),role="";
   if(casal){role=roleOf(raw);raw=clean(raw)}
-  const list=raw.split(casal?" & ":", ").map(s=>s.trim()).filter(Boolean);
+  const list=raw.split(casal?" & ":/\s*,\s*/).map(s=>s.trim()).filter(Boolean);
   out.push({sec,g,row,id:String(row[0]),cap:Number(row[1])||0,list,role,casal});
 })));return out}
 const people=()=>rooms().flatMap(r=>r.list.map(e=>({entry:e,name:clean(e),r})));
