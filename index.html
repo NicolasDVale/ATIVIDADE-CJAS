@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Distribuição de Bangalôs — CJAS 2026</title>
+<title>Conferência de Jovens Adultos Solteiros — CJAS 2026</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -122,6 +122,128 @@ body {
 }
 .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
 
+/* Botão de Navegação / Voltar */
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+.btn-back {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s;
+}
+.btn-back:hover { background: #e2e8f0; }
+
+/* Card da Página Inicial */
+.home-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  max-width: 580px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+.home-card h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.home-card p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.home-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.home-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.home-input-box svg {
+  position: absolute;
+  left: 1rem;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+.home-input-box input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 0.8rem 1rem 0.8rem 2.6rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: all 0.15s;
+}
+.home-input-box input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Card do Crachá Digital */
+.badge-container {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+}
+.badge-room-tag {
+  display: inline-block;
+  background: #0f172a;
+  color: #fff;
+  padding: 0.5rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin: 0.9rem 0;
+}
+#qrcode-view {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  width: fit-content;
+  margin: 1rem auto;
+}
+
 /* KPI Stats */
 .stats-grid {
   display: grid;
@@ -229,6 +351,25 @@ body {
   color: #fff;
   border-color: var(--ink);
 }
+.btn-primary {
+  border: 0;
+  background: #0f172a;
+  color: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.7rem 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-primary:hover { background: #334155; }
+
 .btn-print {
   border: 0;
   background: #0f172a;
@@ -454,15 +595,6 @@ body {
   background: var(--bg); color: var(--ink); font: inherit; font-size: 0.9rem;
 }
 
-.badge-card {
-  text-align: center;
-}
-.badge-room {
-  display: inline-block; background: #0f172a; color: #fff;
-  padding: 0.4rem 1.2rem; border-radius: 999px; font-weight: 800; font-size: 1.1rem; margin: 0.8rem 0;
-}
-#qrcode { display: flex; justify-content: center; padding: 0.8rem; background: #fff; border-radius: 12px; border: 1px solid var(--line); width: fit-content; margin: 1rem auto; }
-
 /* Tabela Admin */
 .admin-table-container {
   max-height: 360px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; margin-top: 1rem;
@@ -495,7 +627,8 @@ footer b { color: var(--ink); }
 @page { size: A4 portrait; margin: 8mm 8mm; }
 @media print {
   body { background: #fff; padding: 0; font-size: 8pt; }
-  .control-bar, .stats-grid, footer, .empty-msg, .modal-overlay { display: none !important; }
+  .control-bar, .stats-grid, footer, .empty-msg, .modal-overlay, .nav-bar, #screen-home, #screen-badge { display: none !important; }
+  #screen-distribution { display: block !important; }
   .page { max-width: none; }
   .masthead {
     border-radius: 0;
@@ -527,7 +660,7 @@ footer b { color: var(--ink); }
 <body>
 <div class="page">
 
-  <!-- Header Banner -->
+  <!-- Header Banner Principal -->
   <header class="masthead">
     <span class="kicker">A Igreja de Jesus Cristo dos Santos dos Últimos Dias</span>
     <h1>Conferência de Jovens Adultos Solteiros — CJAS 2026</h1>
@@ -535,78 +668,151 @@ footer b { color: var(--ink); }
     <div class="chips">
       <span class="chip"><span class="dot"></span> Rio das Garças Eco Resort</span>
       <span class="chip"><span class="dot"></span> 09 a 12 de Outubro de 2026</span>
-      <span class="chip"><span class="dot"></span> 24 Bangalôs Alocados</span>
+      <span class="chip"><span class="dot"></span> Portal do Participante</span>
     </div>
   </header>
 
-  <!-- Métricas Rápidas -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <span class="val" id="stat-guests">199</span>
-      <span class="lbl">Total de Hóspedes</span>
-    </div>
-    <div class="stat-card">
-      <span class="val" id="stat-checkins" style="color:var(--ok);">0</span>
-      <span class="lbl">Check-ins Realizados</span>
-    </div>
-    <div class="stat-card">
-      <span class="val">89</span>
-      <span class="lbl">Ala Feminina</span>
-    </div>
-    <div class="stat-card">
-      <span class="val">104</span>
-      <span class="lbl">Ala Masculina</span>
-    </div>
-    <div class="stat-card">
-      <span class="val" style="color:var(--ok);">4</span>
-      <span class="lbl">Vagas Livres (Ala Masc.)</span>
-    </div>
-  </div>
+  <!-- TELA 1: PÁGINA INICIAL / CONSULTA -->
+  <main id="screen-home">
+    <div class="home-card">
+      <h2>Consulte seu Bangalô e QR Code</h2>
+      <p>Digite seu nome completo abaixo para visualizar suas acomodações e gerar seu crachá digital de check-in.</p>
+      
+      <form class="home-form" onsubmit="handleHomeSearch(event)">
+        <div class="home-input-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="home-name-input" placeholder="Digite seu nome (Ex: Liciane Oliveira)..." required>
+        </div>
+        <button type="submit" class="btn-primary">
+          Visualizar Crachá Digital & QR Code
+        </button>
+      </form>
 
-  <!-- Barra de Ferramentas / Busca / Filtros -->
-  <div class="control-bar">
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <input id="q" type="search" placeholder="Buscar participante, cargo ou bangalô…" aria-label="Buscar pessoa ou bangalô">
+      <div class="home-actions">
+        <button class="filter-btn" style="justify-content:center; padding: 0.6rem 1rem;" onclick="showScreen('distribution')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Ver Lista Completa de Bangalôs
+        </button>
+        <button class="filter-btn" style="justify-content:center; padding: 0.6rem 1rem;" onclick="openAdminArea()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Área da Liderança / Check-in
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- TELA 2: CRACHÁ DIGITAL RESULTADO -->
+  <main id="screen-badge" style="display:none;">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="showScreen('home')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Voltar para a Busca
+      </button>
+      <button class="filter-btn" onclick="showScreen('distribution')">Ver Lista Completa</button>
     </div>
 
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">Todos</button>
-      <button class="filter-btn" data-filter="casal">Casais</button>
-      <button class="filter-btn" data-filter="fem">Ala Feminina</button>
-      <button class="filter-btn" data-filter="masc">Ala Masculina</button>
-      <button class="filter-btn" data-filter="lead">Liderança</button>
+    <div class="badge-container">
+      <span class="kicker" style="background:var(--bg); color:var(--muted); border-color:var(--line);">CJAS 2026 · Crachá Oficial</span>
+      <h2 id="badge-person-name" style="margin-top:0.4rem; font-size:1.4rem;">---</h2>
+      <div class="badge-room-tag" id="badge-room-tag">Bangalô --</div>
+      <div id="qrcode-view"></div>
+      
+      <div style="text-align:left; background:var(--bg); padding:0.9rem 1.1rem; border-radius:12px; border:1px solid var(--line); margin-top:1rem;">
+        <small style="font-weight:700; color:var(--muted); text-transform:uppercase; font-size:0.72rem;">Colegas de Quarto:</small>
+        <ul id="badge-roommates-list" style="font-size:0.85rem; margin-top:0.4rem; padding-left:1.1rem; color:var(--ink);"></ul>
+      </div>
+
+      <button class="btn-primary" style="margin-top:1.2rem; width:100%;" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Imprimir ou Salvar Crachá
+      </button>
+    </div>
+  </main>
+
+  <!-- TELA 3: LISTA COMPLETA DE BANGALÔS -->
+  <main id="screen-distribution" style="display:none;">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="showScreen('home')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Voltar à Página Inicial
+      </button>
+      <button class="filter-btn" onclick="openAdminArea()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Liderança
+      </button>
     </div>
 
-    <button class="filter-btn" onclick="openModal('modal-participant')">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="13" y2="12"></line>
-      </svg>
-      Meu QR Code
-    </button>
+    <!-- Métricas Rápidas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="val">199</span>
+        <span class="lbl">Total de Hóspedes</span>
+      </div>
+      <div class="stat-card">
+        <span class="val" id="stat-checkins" style="color:var(--ok);">0</span>
+        <span class="lbl">Check-ins Realizados</span>
+      </div>
+      <div class="stat-card">
+        <span class="val">89</span>
+        <span class="lbl">Ala Feminina</span>
+      </div>
+      <div class="stat-card">
+        <span class="val">104</span>
+        <span class="lbl">Ala Masculina</span>
+      </div>
+      <div class="stat-card">
+        <span class="val" style="color:var(--ok);">4</span>
+        <span class="lbl">Vagas Livres (Ala Masc.)</span>
+      </div>
+    </div>
 
-    <button class="filter-btn" onclick="openAdminArea()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-      </svg>
-      Liderança
-    </button>
+    <!-- Barra de Ferramentas / Busca / Filtros -->
+    <div class="control-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="q" type="search" placeholder="Buscar participante, cargo ou bangalô…" aria-label="Buscar pessoa ou bangalô">
+      </div>
 
-    <button class="btn-print" onclick="window.print()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="6 9 6 2 18 2 18 9"></polyline>
-        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-        <rect x="6" y="14" width="12" height="8"></rect>
-      </svg>
-      Imprimir / PDF
-    </button>
-  </div>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="casal">Casais</button>
+        <button class="filter-btn" data-filter="fem">Ala Feminina</button>
+        <button class="filter-btn" data-filter="masc">Ala Masculina</button>
+        <button class="filter-btn" data-filter="lead">Liderança</button>
+      </div>
 
-  <!-- Conteúdo Renderizado -->
-  <main id="app"></main>
-  <p class="empty-msg" id="empty">Nenhum hóspede ou bangalô corresponde aos termos pesquisados.</p>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Imprimir PDF
+      </button>
+    </div>
+
+    <!-- Conteúdo Renderizado -->
+    <div id="app"></div>
+    <p class="empty-msg" id="empty">Nenhum hóspede ou bangalô corresponde aos termos pesquisados.</p>
+  </main>
 
   <footer>
     Distribuição Atualizada · <b>CJAS 2026</b> · Em caso de dúvidas ou alterações, contate a Equipe de Logística
@@ -614,36 +820,6 @@ footer b { color: var(--ink); }
 </div>
 
 <!-- MODAIS DA APLICAÇÃO -->
-
-<!-- Modal: Crachá Digital do Participante -->
-<div class="modal-overlay" id="modal-participant">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-participant')">✕</button>
-    <div id="participant-search-step">
-      <h3 style="margin-bottom:0.5rem;">Gerar Crachá Digital</h3>
-      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Digite seu nome completo para visualizar seu bangalô e gerar seu QR Code de check-in.</p>
-      <form onsubmit="handleParticipantSearch(event)">
-        <div class="form-group">
-          <label>Nome Completo</label>
-          <input type="text" id="participant-input-name" placeholder="Ex: Liciane Oliveira" required>
-        </div>
-        <button type="submit" class="btn-print" style="width:100%; justify-content:center;">Visualizar Crachá</button>
-      </form>
-    </div>
-
-    <div id="participant-badge-step" style="display:none;" class="badge-card">
-      <span class="kicker" style="background:var(--bg); color:var(--muted); border-color:var(--line);">CJAS 2026 · Crachá Oficial</span>
-      <h2 id="badge-name" style="margin-top:0.4rem; font-size:1.3rem;">---</h2>
-      <div class="badge-room" id="badge-room">Bangalô --</div>
-      <div id="qrcode"></div>
-      <div style="text-align:left; background:var(--bg); padding:0.8rem 1rem; border-radius:10px; border:1px solid var(--line); margin-top:0.8rem;">
-        <small style="font-weight:700; color:var(--muted); text-transform:uppercase;">Colegas de Quarto:</small>
-        <ul id="badge-roommates" style="font-size:0.82rem; margin-top:0.3rem; padding-left:1rem;"></ul>
-      </div>
-      <button class="filter-btn" style="margin-top:1rem; width:100%; justify-content:center;" onclick="resetParticipantModal()">Buscar Outro Nome</button>
-    </div>
-  </div>
-</div>
 
 <!-- Modal: Login Admin -->
 <div class="modal-overlay" id="modal-login">
@@ -660,7 +836,7 @@ footer b { color: var(--ink); }
         <label>Senha</label>
         <input type="password" id="admin-pass" placeholder="Digite sua senha" required>
       </div>
-      <button type="submit" class="btn-print" style="width:100%; justify-content:center;">Acessar Painel</button>
+      <button type="submit" class="btn-primary" style="width:100%;">Acessar Painel</button>
     </form>
   </div>
 </div>
@@ -683,7 +859,7 @@ footer b { color: var(--ink); }
       <button class="filter-btn" onclick="logoutAdmin()" style="color:var(--fem);">Sair</button>
     </div>
 
-    <input id="admin-search-input" type="search" placeholder="Filtrar participante…" oninput="renderAdminTable()" style="width:100%; padding:0.5rem 0.8rem; border-radius:8px; border:1px solid var(--line); font-size:0.85rem;">
+    <input id="admin-search-input" type="search" placeholder="Filtrar participante por nome ou bangalô…" oninput="renderAdminTable()" style="width:100%; padding:0.5rem 0.8rem; border-radius:8px; border:1px solid var(--line); font-size:0.85rem;">
 
     <div class="admin-table-container">
       <table class="admin-table">
@@ -721,7 +897,7 @@ footer b { color: var(--ink); }
       <label>Selecione o Novo Bangalô</label>
       <select id="transfer-select-room"></select>
     </div>
-    <button onclick="confirmTransfer()" class="btn-print" style="width:100%; justify-content:center;">Confirmar Transferência</button>
+    <button onclick="confirmTransfer()" class="btn-primary" style="width:100%;">Confirmar Transferência</button>
   </div>
 </div>
 
@@ -735,7 +911,7 @@ footer b { color: var(--ink); }
         <label>Nova Senha</label>
         <input type="password" id="new-pass-input" placeholder="Digite a nova senha" required>
       </div>
-      <button type="submit" class="btn-print" style="width:100%; justify-content:center;">Salvar Senha</button>
+      <button type="submit" class="btn-primary" style="width:100%;">Salvar Senha</button>
     </form>
   </div>
 </div>
@@ -829,7 +1005,7 @@ const INITIAL_DATA = [
   }
 ];
 
-// Estado da Aplicação
+// Estado Global
 let currentData = INITIAL_DATA;
 let checkins = {};
 let adminPass = 'cjas2026';
@@ -844,6 +1020,13 @@ const el = (t, c, x) => {
   if (x != null) e.textContent = x;
   return e;
 };
+
+// Navegação entre Telas
+function showScreen(screenId) {
+  document.getElementById('screen-home').style.display = screenId === 'home' ? 'block' : 'none';
+  document.getElementById('screen-badge').style.display = screenId === 'badge' ? 'block' : 'none';
+  document.getElementById('screen-distribution').style.display = screenId === 'distribution' ? 'block' : 'none';
+}
 
 // Sincronização em Tempo Real (Firebase)
 db.ref('cjas_data').on('value', snapshot => {
@@ -866,12 +1049,63 @@ db.ref('cjas_pass').on('value', snapshot => {
 
 function updateKPIs() {
   const totalChecked = Object.values(checkins).filter(Boolean).length;
-  document.getElementById('stat-checkins').textContent = totalChecked;
+  const statEl = document.getElementById('stat-checkins');
+  if (statEl) statEl.textContent = totalChecked;
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+// Pesquisa da Página Inicial
+function findPerson(query) {
+  const term = norm(query);
+  let found = null;
+
+  currentData.forEach(sec => {
+    sec.groups.forEach(g => {
+      g.rows.forEach(([id, cap, raw]) => {
+        let names = typeof raw === "string" ? raw.split(", ") : raw;
+        if (sec.cls === "casal") {
+          const m = raw.match(/^(.*)\s\(([^)]+)\)$/);
+          if (m) names = m[1].split(" & ");
+        }
+        names.forEach(p => {
+          const cleanName = p.replace(/\s*\([^)]+\)/g, "");
+          if (norm(cleanName).includes(term) || norm(p).includes(term)) {
+            found = { person: cleanName, room: id, roommates: names };
+          }
+        });
+      });
+    });
+  });
+  return found;
+}
+
+function handleHomeSearch(e) {
+  e.preventDefault();
+  const query = document.getElementById('home-name-input').value.trim();
+  const match = findPerson(query);
+
+  if (match) {
+    document.getElementById('badge-person-name').textContent = match.person;
+    document.getElementById('badge-room-tag').textContent = `Bangalô Nº ${match.room}`;
+
+    const roommatesUl = document.getElementById('badge-roommates-list');
+    roommatesUl.innerHTML = match.roommates
+      .filter(m => !m.includes(match.person))
+      .map(m => `<li>${m}</li>`).join('');
+
+    const qrContainer = document.getElementById('qrcode-view');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, { text: match.person, width: 150, height: 150 });
+
+    showScreen('badge');
+  } else {
+    alert('Participante não encontrado! Tente buscar apenas pelo primeiro nome ou verifique a grafia.');
+  }
+}
+
+// Renderização dos Bangalôs na Lista Completa
 function formatPersonLi(txt) {
   const li = el("li");
   const m = txt.match(/^(.*?)\s*\(([^)]+)\)$/);
@@ -973,6 +1207,7 @@ const emptyMsg = document.getElementById("empty");
 let currentFilter = "all";
 
 function filterCards() {
+  if (!q) return;
   const term = norm(q.value.trim());
   let visibleCount = 0;
 
@@ -1005,10 +1240,10 @@ function filterCards() {
     w.style.display = hasVisible ? "" : "none";
   });
 
-  emptyMsg.style.display = visibleCount === 0 ? "block" : "none";
+  if (emptyMsg) emptyMsg.style.display = visibleCount === 0 ? "block" : "none";
 }
 
-q.addEventListener("input", filterCards);
+if (q) q.addEventListener("input", filterCards);
 
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -1021,62 +1256,6 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
     filterCards();
   });
 });
-
-/* CRACHÁ DO PARTICIPANTE */
-function findPerson(query) {
-  const term = norm(query);
-  let found = null;
-
-  currentData.forEach(sec => {
-    sec.groups.forEach(g => {
-      g.rows.forEach(([id, cap, raw]) => {
-        let names = typeof raw === "string" ? raw.split(", ") : raw;
-        if (sec.cls === "casal") {
-          const m = raw.match(/^(.*)\s\(([^)]+)\)$/);
-          if (m) names = m[1].split(" & ");
-        }
-        names.forEach(p => {
-          const cleanName = p.replace(/\s*\([^)]+\)/g, "");
-          if (norm(cleanName).includes(term) || norm(p).includes(term)) {
-            found = { person: cleanName, room: id, roommates: names };
-          }
-        });
-      });
-    });
-  });
-  return found;
-}
-
-function handleParticipantSearch(e) {
-  e.preventDefault();
-  const query = document.getElementById('participant-input-name').value.trim();
-  const match = findPerson(query);
-
-  if (match) {
-    document.getElementById('participant-search-step').style.display = 'none';
-    document.getElementById('participant-badge-step').style.display = 'block';
-
-    document.getElementById('badge-name').textContent = match.person;
-    document.getElementById('badge-room').textContent = `Bangalô Nº ${match.room}`;
-
-    const roommatesUl = document.getElementById('badge-roommates');
-    roommatesUl.innerHTML = match.roommates
-      .filter(m => !m.includes(match.person))
-      .map(m => `<li>${m}</li>`).join('');
-
-    const qrContainer = document.getElementById('qrcode');
-    qrContainer.innerHTML = '';
-    new QRCode(qrContainer, { text: match.person, width: 150, height: 150 });
-  } else {
-    alert('Participante não encontrado! Tente buscar apenas pelo primeiro nome.');
-  }
-}
-
-function resetParticipantModal() {
-  document.getElementById('participant-search-step').style.display = 'block';
-  document.getElementById('participant-badge-step').style.display = 'none';
-  document.getElementById('participant-input-name').value = '';
-}
 
 /* ÁREA DA LIDERANÇA / ADMIN */
 function openAdminArea() {
