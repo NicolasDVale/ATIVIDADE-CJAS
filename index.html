@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Conferência de Jovens Adultos Solteiros — CJAS 2026</title>
+<title>Sistema de Gestão de Eventos & Credenciamento</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -12,40 +12,29 @@
 <!-- Gerador de QR Code -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-<!-- Leitor de QR Code via Câmera -->
-<script src="https://unpkg.com/html5-qrcode"></script>
-
 <style>
 :root {
-  --bg: #f4f6fb;
+  --bg: #f8fafc;
   --surface: #ffffff;
   --ink: #0f172a;
   --muted: #64748b;
   --line: #e2e8f0;
-  
-  --casal: #b45309;
-  --casal-bg: #fffbeb;
-  --casal-badge: #fde68a;
-  --casal-border: #fcd34d;
 
-  --fem: #be185d;
-  --fem-bg: #fdf2f8;
-  --fem-badge: #fbcfe8;
-  --fem-border: #f472b6;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-bg: #eff6ff;
 
-  --masc: #1d4ed8;
-  --masc-bg: #eff6ff;
-  --masc-badge: #bfdbfe;
-  --masc-border: #60a5fa;
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
 
-  --ok: #059669;
-  --ok-bg: #ecfdf5;
-  --ok-border: #a7f3d0;
+  --warning: #f59e0b;
+  --warning-bg: #fffbeb;
 
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
-  --radius: 14px;
+  --radius: 16px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,7 +47,7 @@ body {
 }
 .page { max-width: 1040px; margin: 0 auto; }
 
-/* Header Banner */
+/* Banner Principal */
 .masthead {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
   color: #fff;
@@ -68,14 +57,6 @@ body {
   margin-bottom: 1.4rem;
   position: relative;
   overflow: hidden;
-}
-.masthead::after {
-  content: "";
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 240px; height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
 }
 .kicker {
   display: inline-block;
@@ -94,13 +75,11 @@ body {
   font-size: clamp(1.45rem, 3.6vw, 2.1rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.2;
 }
-.masthead .sub {
+.sub {
   margin-top: 0.4rem;
   color: #94a3b8;
   font-size: 0.95rem;
-  font-weight: 500;
 }
 .chips {
   display: flex;
@@ -120,9 +99,8 @@ body {
   padding: 0.35rem 0.85rem;
   color: #e2e8f0;
 }
-.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
 
-/* Botões de Navegação */
+/* Navegação */
 .nav-bar {
   display: flex;
   justify-content: space-between;
@@ -139,16 +117,13 @@ body {
   padding: 0.5rem 1rem;
   border-radius: 999px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
   box-shadow: var(--shadow-sm);
   transition: all 0.15s;
 }
 .btn-back:hover { background: #e2e8f0; }
 
-/* Card da Página Inicial */
-.home-card {
+/* Cards Principais */
+.card-box {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -158,96 +133,32 @@ body {
   margin: 0 auto 2rem;
   text-align: center;
 }
-.home-card h2 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin-bottom: 0.4rem;
+.card-box h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem; }
+.card-box p { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+.form-group { margin-bottom: 1rem; text-align: left; }
+.form-group label {
+  display: block; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
 }
-.home-card p {
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-bottom: 1.5rem;
+.input-field {
+  width: 100%; border: 1px solid var(--line); background: var(--bg);
+  border-radius: 12px; padding: 0.8rem 1rem; font: inherit; font-size: 0.95rem;
+  color: var(--ink); transition: all 0.15s;
 }
-.home-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-.home-input-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.home-input-box svg {
-  position: absolute;
-  left: 1rem;
-  width: 18px;
-  height: 18px;
-  color: var(--muted);
-}
-.home-input-box input {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  border-radius: 12px;
-  padding: 0.8rem 1rem 0.8rem 2.6rem;
-  font: inherit;
-  font-size: 0.95rem;
-  color: var(--ink);
-  transition: all 0.15s;
-}
-.home-input-box input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
-.home-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 1.5rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid var(--line);
+.input-field:focus {
+  outline: none; border-color: var(--primary); background: #fff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
 }
 
-/* Card do Crachá Digital */
-.badge-container {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
-  max-width: 480px;
-  margin: 0 auto;
-  text-align: center;
+.btn-primary {
+  width: 100%; border: 0; background: var(--ink); color: #fff;
+  font: inherit; font-size: 0.9rem; font-weight: 600; padding: 0.75rem 1.2rem;
+  border-radius: 10px; cursor: pointer; transition: background 0.15s;
 }
-.badge-room-tag {
-  display: inline-block;
-  background: #0f172a;
-  color: #fff;
-  padding: 0.5rem 1.4rem;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 1.2rem;
-  margin: 0.9rem 0;
-}
-#qrcode-view {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  background: #fff;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  width: 180px;
-  height: 180px;
-  margin: 1rem auto;
-}
-#qrcode-view img { max-width: 100%; height: auto; }
+.btn-primary:hover { background: #334155; }
 
-/* KPI Stats */
+/* Grade de Indicadores (KPIs) */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -260,365 +171,91 @@ body {
   border-radius: 14px;
   padding: 0.9rem 1.1rem;
   box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
 }
-.stat-card .val {
-  font-size: 1.65rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--ink);
-}
+.stat-card .val { font-size: 1.65rem; font-weight: 800; line-height: 1.1; }
 .stat-card .lbl {
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 0.25rem;
+  font-size: 0.76rem; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; margin-top: 0.25rem;
 }
 
-/* Barra de Controle */
+/* Barra de Filtro e Busca */
 .control-bar {
-  position: sticky;
-  top: 0.8rem;
-  z-index: 30;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 0.6rem 0.8rem;
-  box-shadow: var(--shadow-md);
-  margin-bottom: 1.8rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: center;
+  position: sticky; top: 0.8rem; z-index: 30;
+  background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px);
+  border: 1px solid var(--line); border-radius: 16px; padding: 0.6rem 0.8rem;
+  box-shadow: var(--shadow-md); margin-bottom: 1.8rem;
+  display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
 }
-.search-box {
-  flex: 1;
-  min-width: 220px;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.search-box svg {
-  position: absolute;
-  left: 0.9rem;
-  width: 17px;
-  height: 17px;
-  color: var(--muted);
-  pointer-events: none;
-}
-.search-box input {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  border-radius: 999px;
-  padding: 0.55rem 1rem 0.55rem 2.35rem;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--ink);
-  transition: all 0.15s;
-}
-.search-box input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
-.filters {
-  display: flex;
-  gap: 0.35rem;
-  overflow-x: auto;
-}
+.search-box { flex: 1; min-width: 220px; }
 .filter-btn {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.45rem 0.85rem;
-  border-radius: 999px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+  font: inherit; font-size: 0.8rem; font-weight: 600; padding: 0.45rem 0.85rem;
+  border-radius: 999px; cursor: pointer; transition: all 0.15s;
 }
-.filter-btn:hover { background: #e2e8f0; color: var(--ink); }
-.filter-btn.active {
-  background: var(--ink);
-  color: #fff;
-  border-color: var(--ink);
-}
-.btn-primary {
-  border: 0;
-  background: #0f172a;
-  color: #fff;
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 0.7rem 1.2rem;
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-.btn-primary:hover { background: #334155; }
+.filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-.btn-print {
-  border: 0;
-  background: #0f172a;
-  color: #fff;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 0.55rem 1.1rem;
-  border-radius: 999px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-.btn-print:hover { background: #334155; }
-
-/* Asas / Seções */
-.wing { margin-top: 2rem; }
-.wing-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 0.9rem 1.2rem;
-  border-radius: 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 6px solid var(--c);
-  margin-bottom: 0.9rem;
-  box-shadow: var(--shadow-sm);
-}
-.wing-title {
-  display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
-  flex-wrap: wrap;
-}
-.wing-title h2 { font-size: 1.25rem; font-weight: 700; color: var(--ink); }
-.wing-title .note { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
-.wing-badge {
-  font-size: 0.74rem;
-  font-weight: 700;
-  padding: 0.28rem 0.75rem;
-  border-radius: 999px;
-  background: var(--bg-c);
-  color: var(--c);
-  border: 1px solid var(--c-border);
-}
-
-.subgroup-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin: 1.3rem 0.3rem 0.6rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.subgroup-title::after {
-  content: ""; flex: 1; height: 1px; background: var(--line);
-}
-
-/* Card de Bangalô */
-.bangalo-card {
-  display: grid;
-  grid-template-columns: 88px 1fr auto;
-  gap: 1.2rem;
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 0.9rem 1.15rem;
-  margin-bottom: 0.6rem;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-}
-.bangalo-card:hover {
-  border-color: var(--c-border);
-  box-shadow: var(--shadow-md);
-}
-
-.bangalo-num {
-  background: var(--bg-c);
-  border: 1px solid var(--c-border);
-  color: var(--c);
-  border-radius: 12px;
-  text-align: center;
-  padding: 0.5rem 0.2rem;
-}
-.bangalo-num small {
-  display: block; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85;
-}
-.bangalo-num b { font-size: 1.7rem; font-weight: 800; line-height: 1.05; }
-
-.occupants {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 1.6rem;
-  row-gap: 0.35rem;
-  font-size: 0.88rem;
-}
-.casal .occupants { grid-template-columns: 1fr; font-size: 0.95rem; }
-.occupants li {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; padding: 0.18rem 0; color: #1e293b;
-}
-.occupants li.hit { background: #fef08a; border-radius: 4px; padding: 0.18rem 0.4rem; }
-
-.role-badge {
-  font-size: 0.67rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 6px;
-  background: var(--bg-c); color: var(--c); border: 1px solid var(--c-border); white-space: nowrap;
-}
-
-.check-tag {
-  font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px;
-  background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); text-transform: uppercase;
-}
-
-.cap-badge {
-  font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 999px;
-  background: #f1f5f9; color: #475569; white-space: nowrap;
-}
-.cap-badge.full { background: var(--bg-c); color: var(--c); border: 1px solid var(--c-border); }
-.cap-badge.free { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
-
-.casal { --c: var(--casal); --bg-c: var(--casal-bg); --c-border: var(--casal-border); }
-.fem   { --c: var(--fem);   --bg-c: var(--fem-bg);   --c-border: var(--fem-border); }
-.masc  { --c: var(--masc);  --bg-c: var(--masc-bg);  --c-border: var(--masc-border); }
-
-.empty-msg {
-  display: none; text-align: center; color: var(--muted); padding: 3rem 1rem; font-size: 0.95rem;
-  background: var(--surface); border-radius: var(--radius); border: 1px dashed var(--line);
+/* QR Code Display */
+#qrcode-container {
+  display: flex; justify-content: center; align-items: center;
+  padding: 1rem; background: #fff; border-radius: 14px;
+  border: 1px solid var(--line); width: 180px; height: 180px; margin: 1rem auto;
 }
 
 /* Modais */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem;
+  backdrop-filter: blur(4px); display: none; align-items: center;
+  justify-content: center; z-index: 100; padding: 1rem;
 }
 .modal-overlay.active { display: flex; }
 .modal {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
-  max-width: 480px; width: 100%; padding: 1.8rem; position: relative; box-shadow: var(--shadow-md);
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 20px; max-width: 480px; width: 100%; padding: 1.8rem; position: relative;
 }
 .modal-close {
-  position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none;
-  font-size: 1.2rem; cursor: pointer; color: var(--muted); font-weight: bold;
+  position: absolute; top: 1.2rem; right: 1.2rem;
+  background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted);
 }
-.form-group { margin-bottom: 1rem; text-align: left; }
-.form-group label { display: block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
-.form-group input, .form-group select {
-  width: 100%; padding: 0.65rem 0.9rem; border-radius: 8px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font: inherit; font-size: 0.9rem;
-}
-
-/* Tabela Admin */
-.admin-table-container {
-  max-height: 360px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; margin-top: 1rem;
-}
-.admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-.admin-table th, .admin-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); }
-.admin-table th { background: var(--bg); color: var(--muted); font-size: 0.7rem; text-transform: uppercase; position: sticky; top: 0; }
 
 footer { margin-top: 3.5rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
-footer b { color: var(--ink); }
 
-@media (max-width: 700px) {
-  body { padding: 0.8rem 0.6rem 3rem; }
-  .masthead { padding: 1.5rem 1.2rem; border-radius: 16px; }
-  .bangalo-card { grid-template-columns: 70px 1fr; gap: 0.8rem; padding: 0.8rem 0.9rem; }
-  .cap-badge { grid-column: 2; justify-self: start; margin-top: 0.2rem; }
-  .occupants { grid-template-columns: 1fr; }
-  .bangalo-num b { font-size: 1.4rem; }
-}
-
-@page { size: A4 portrait; margin: 8mm 8mm; }
 @media print {
-  body { background: #fff; padding: 0; font-size: 8pt; }
-  .control-bar, .stats-grid, footer, .empty-msg, .modal-overlay, .nav-bar, #screen-home, #screen-badge { display: none !important; }
-  #screen-distribution { display: block !important; }
-  .page { max-width: none; }
-  .masthead { border-radius: 0; padding: 0.7rem 1rem; margin-bottom: 0.5rem; box-shadow: none; background: #0f172a !important; }
-  .masthead h1 { font-size: 1.2rem; }
-  .chips { display: none; }
-  .wing { margin-top: 0.8rem; }
-  .wing.break-before { break-before: page; page-break-before: always; margin-top: 0; }
-  .wing-header { box-shadow: none; border-radius: 6px; padding: 0.4rem 0.7rem; margin-bottom: 0.4rem; }
-  .bangalo-card { box-shadow: none; border-radius: 6px; padding: 0.35rem 0.65rem; margin-bottom: 0.3rem; break-inside: avoid; page-break-inside: avoid; }
-  .bangalo-num { padding: 0.2rem 0; }
-  .bangalo-num b { font-size: 1.2rem; }
-  .occupants { font-size: 7.8pt; row-gap: 0.15rem; }
-  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .control-bar, .stats-grid, footer, .nav-bar, #screen-home { display: none !important; }
+  #screen-list { display: block !important; }
+  body { background: #fff; padding: 0; }
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Header Banner Principal -->
+  <!-- Header Banner -->
   <header class="masthead">
-    <span class="kicker">A Igreja de Jesus Cristo dos Santos dos Últimos Dias</span>
-    <h1>Conferência de Jovens Adultos Solteiros — CJAS 2026</h1>
-    <p class="sub">Distribuição oficial de acomodações e quartos</p>
+    <span class="kicker">Painel de Eventos</span>
+    <h1>Credenciamento & Gestão 2026</h1>
+    <p class="sub">Plataforma oficial de controle e acesso de participantes</p>
     <div class="chips">
-      <span class="chip"><span class="dot"></span> Rio das Garças Eco Resort</span>
-      <span class="chip"><span class="dot"></span> 09 a 12 de Outubro de 2026</span>
-      <span class="chip"><span class="dot"></span> Portal do Participante</span>
+      <span class="chip">Centro de Convenções</span>
+      <span class="chip">Outubro, 2026</span>
     </div>
   </header>
 
-  <!-- TELA 1: PÁGINA INICIAL / CONSULTA -->
+  <!-- TELA 1: CONSULTA INICIAL -->
   <main id="screen-home">
-    <div class="home-card">
-      <h2>Consulte seu Bangalô e QR Code</h2>
-      <p>Digite seu nome completo ou primeiro nome abaixo para encontrar seu quarto e gerar o crachá digital.</p>
+    <div class="card-box">
+      <h2>Consultar Credencial</h2>
+      <p>Digite seu nome completo ou ID para visualizar seu crachá e QR Code de acesso.</p>
       
-      <form class="home-form" onsubmit="handleHomeSearch(event)">
-        <div class="home-input-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="home-name-input" placeholder="Digite seu nome (Ex: Liciane Oliveira)..." required>
+      <form onsubmit="handleSearch(event)">
+        <div class="form-group">
+          <input type="text" id="input-search-name" class="input-field" placeholder="Digite seu nome..." required>
         </div>
-        <button type="submit" class="btn-primary">
-          Visualizar Crachá Digital & QR Code
-        </button>
+        <button type="submit" class="btn-primary">Gerar Crachá Digital</button>
       </form>
 
-      <div class="home-actions">
-        <button class="filter-btn" style="justify-content:center; padding: 0.6rem 1rem;" onclick="showScreen('distribution')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          Ver Lista Completa de Bangalôs
-        </button>
-        <button class="filter-btn" style="justify-content:center; padding: 0.6rem 1rem;" onclick="openAdminArea()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          Área da Liderança / Check-in
-        </button>
+      <div style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--line); display: flex; gap: 0.5rem; flex-direction: column;">
+        <button class="filter-btn" onclick="showScreen('list')">Ver Lista Geral de Participantes</button>
+        <button class="filter-btn" onclick="openModal('modal-login')">Área Administrativa</button>
       </div>
     </div>
   </main>
@@ -626,776 +263,193 @@ footer b { color: var(--ink); }
   <!-- TELA 2: CRACHÁ DIGITAL RESULTADO -->
   <main id="screen-badge" style="display:none;">
     <div class="nav-bar">
-      <button class="btn-back" onclick="showScreen('home')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Voltar para a Busca
-      </button>
-      <button class="filter-btn" onclick="showScreen('distribution')">Ver Lista Completa</button>
+      <button class="btn-back" onclick="showScreen('home')">← Voltar para Busca</button>
+      <button class="filter-btn" onclick="showScreen('list')">Ver Lista Completa</button>
     </div>
 
-    <div class="badge-container">
-      <span class="kicker" style="background:var(--bg); color:var(--muted); border-color:var(--line);">CJAS 2026 · Crachá Oficial</span>
-      <h2 id="badge-person-name" style="margin-top:0.4rem; font-size:1.4rem;">---</h2>
-      <div class="badge-room-tag" id="badge-room-tag">Bangalô --</div>
+    <div class="card-box" style="max-width: 480px;">
+      <span class="kicker" style="background:var(--bg); color:var(--muted); border-color:var(--line);">Credencial Oficial</span>
+      <h2 id="badge-name" style="margin-top:0.4rem;">---</h2>
+      <p id="badge-role" style="color:var(--primary); font-weight:700;">---</p>
       
       <!-- QR Code -->
-      <div id="qrcode-view"></div>
-      
-      <div style="text-align:left; background:var(--bg); padding:0.9rem 1.1rem; border-radius:12px; border:1px solid var(--line); margin-top:1rem;">
-        <small style="font-weight:700; color:var(--muted); text-transform:uppercase; font-size:0.72rem;">Colegas de Quarto:</small>
-        <ul id="badge-roommates-list" style="font-size:0.85rem; margin-top:0.4rem; padding-left:1.1rem; color:var(--ink);"></ul>
-      </div>
+      <div id="qrcode-container"></div>
 
-      <button class="btn-primary" style="margin-top:1.2rem; width:100%;" onclick="window.print()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-          <rect x="6" y="14" width="12" height="8"></rect>
-        </svg>
-        Imprimir ou Salvar Crachá
-      </button>
+      <button class="btn-primary" onclick="window.print()" style="margin-top:1rem;">Imprimir Crachá</button>
     </div>
   </main>
 
-  <!-- TELA 3: LISTA COMPLETA DE BANGALÔS -->
-  <main id="screen-distribution" style="display:none;">
+  <!-- TELA 3: LISTA COMPLETA -->
+  <main id="screen-list" style="display:none;">
     <div class="nav-bar">
-      <button class="btn-back" onclick="showScreen('home')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Voltar à Página Inicial
-      </button>
-      <button class="filter-btn" onclick="openAdminArea()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        Liderança
-      </button>
+      <button class="btn-back" onclick="showScreen('home')">← Voltar ao Início</button>
     </div>
 
-    <!-- Métricas -->
+    <!-- Indicadores -->
     <div class="stats-grid">
       <div class="stat-card">
-        <span class="val">199</span>
-        <span class="lbl">Total de Hóspedes</span>
+        <span class="val" id="stat-total">0</span>
+        <span class="lbl">Total Confirmados</span>
       </div>
       <div class="stat-card">
-        <span class="val" id="stat-checkins" style="color:var(--ok);">0</span>
+        <span class="val" id="stat-checkins" style="color:var(--success);">0</span>
         <span class="lbl">Check-ins Realizados</span>
       </div>
-      <div class="stat-card">
-        <span class="val">89</span>
-        <span class="lbl">Ala Feminina</span>
-      </div>
-      <div class="stat-card">
-        <span class="val">104</span>
-        <span class="lbl">Ala Masculina</span>
-      </div>
-      <div class="stat-card">
-        <span class="val" style="color:var(--ok);">4</span>
-        <span class="lbl">Vagas Livres (Ala Masc.)</span>
-      </div>
     </div>
 
-    <!-- Barra de Ferramentas / Busca -->
+    <!-- Barra de Filtros -->
     <div class="control-bar">
       <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input id="q" type="search" placeholder="Buscar participante, cargo ou bangalô…" aria-label="Buscar pessoa ou bangalô">
+        <input type="search" id="q-filter" class="input-field" placeholder="Filtrar por nome ou setor..." oninput="filterList()" style="padding: 0.45rem 0.85rem;">
       </div>
-
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">Todos</button>
-        <button class="filter-btn" data-filter="casal">Casais</button>
-        <button class="filter-btn" data-filter="fem">Ala Feminina</button>
-        <button class="filter-btn" data-filter="masc">Ala Masculina</button>
-        <button class="filter-btn" data-filter="lead">Liderança</button>
-      </div>
-
-      <button class="btn-print" onclick="window.print()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-          <rect x="6" y="14" width="12" height="8"></rect>
-        </svg>
-        Imprimir PDF
-      </button>
+      <button class="filter-btn active" onclick="setCategoryFilter('all', this)">Todos</button>
+      <button class="filter-btn" onclick="setCategoryFilter('vip', this)">VIP</button>
+      <button class="filter-btn" onclick="window.print()">Imprimir PDF</button>
     </div>
 
-    <div id="app"></div>
-    <p class="empty-msg" id="empty">Nenhum hóspede ou bangalô corresponde aos termos pesquisados.</p>
+    <!-- Container dos Itens/Cards -->
+    <div id="list-container"></div>
   </main>
 
   <footer>
-    Distribuição Atualizada · <b>CJAS 2026</b> · Em caso de dúvidas ou alterações, contate a Equipe de Logística
+    Sistema de Gestão & Credenciamento · 2026
   </footer>
 </div>
 
-<!-- MODAIS -->
+<!-- MODAL LOGIN -->
 <div class="modal-overlay" id="modal-login">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-login')">✕</button>
-    <h3 style="margin-bottom:0.5rem;">Painel da Liderança</h3>
-    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Acesso restrito para controle de check-in e transferências.</p>
+    <h3 style="margin-bottom:0.5rem;">Acesso Restrito</h3>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Entre com suas credenciais de organizador.</p>
     <form onsubmit="handleAdminLogin(event)">
       <div class="form-group">
         <label>Usuário</label>
-        <input type="text" id="admin-user" value="admincjas" required>
+        <input type="text" id="admin-user" class="input-field" required>
       </div>
       <div class="form-group">
         <label>Senha</label>
-        <input type="password" id="admin-pass" placeholder="Digite sua senha" required>
+        <input type="password" id="admin-pass" class="input-field" required>
       </div>
-      <button type="submit" class="btn-primary" style="width:100%;">Acessar Painel</button>
-    </form>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-admin-panel">
-  <div class="modal" style="max-width: 650px;">
-    <button class="modal-close" onclick="closeModal('modal-admin-panel')">✕</button>
-    <h3 style="margin-bottom:0.2rem;">Gestão de Check-in & Hóspedes</h3>
-    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Marque os check-ins manualmente ou utilize a câmera para escanear os QR Codes.</p>
-    
-    <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
-      <button class="btn-print" onclick="startScanner()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle>
-        </svg>
-        Escanear QR Code
-      </button>
-      <button class="filter-btn" onclick="openModal('modal-change-pass')">Alterar Senha</button>
-      <button class="filter-btn" onclick="logoutAdmin()" style="color:var(--fem);">Sair</button>
-    </div>
-
-    <input id="admin-search-input" type="search" placeholder="Filtrar participante por nome ou bangalô…" oninput="renderAdminTable()" style="width:100%; padding:0.5rem 0.8rem; border-radius:8px; border:1px solid var(--line); font-size:0.85rem;">
-
-    <div class="admin-table-container">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Check-in</th>
-            <th>Nome</th>
-            <th>Bangalô</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="admin-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-scanner">
-  <div class="modal">
-    <button class="modal-close" onclick="stopScanner()">✕</button>
-    <h3 style="margin-bottom:0.5rem;">Escanear QR Code</h3>
-    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">Aponte a câmera para o QR Code no celular do participante:</p>
-    <div id="reader" style="width:100%; border-radius:12px; overflow:hidden;"></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-transfer">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-transfer')">✕</button>
-    <h3>Transferir Hóspede</h3>
-    <p id="transfer-person-name" style="font-size:0.85rem; font-weight:bold; color:var(--muted); margin:0.5rem 0 1rem;"></p>
-    <div class="form-group">
-      <label>Selecione o Novo Bangalô</label>
-      <select id="transfer-select-room"></select>
-    </div>
-    <button onclick="confirmTransfer()" class="btn-primary" style="width:100%;">Confirmar Transferência</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-change-pass">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-change-pass')">✕</button>
-    <h3>Alterar Senha de Liderança</h3>
-    <form onsubmit="handleChangePassword(event)" style="margin-top:1rem;">
-      <div class="form-group">
-        <label>Nova Senha</label>
-        <input type="password" id="new-pass-input" placeholder="Digite a nova senha" required>
-      </div>
-      <button type="submit" class="btn-primary" style="width:100%;">Salvar Senha</button>
+      <button type="submit" class="btn-primary">Entrar</button>
     </form>
   </div>
 </div>
 
 <script>
-// Dados Iniciais
-const INITIAL_DATA = [
-  {
-    cls: "casal",
-    title: "Bangalôs de Casais (Líderes)",
-    note: "3 bangalôs · 6 hóspedes (100% ocupado)",
-    groups: [
-      {
-        rows: [
-          ["02", 2, "Elany Marcolino & Rutem Marcolino (Casal Diretor)"],
-          ["03", 2, "Luciana Jesus & Ordilei Jesus (Casal de Apoio 1)"],
-          ["04", 2, "Guilherme Santos & Ana Mayara Santos (Casal de Apoio 2 / Saúde)"]
-        ]
-      }
-    ]
-  },
-  {
-    cls: "fem",
-    title: "Ala Feminina",
-    note: "89 de 89 vagas ocupadas (100% ocupado)",
-    groups: [
-      {
-        name: "Liderança Feminina",
-        isLead: true,
-        rows: [
-          ["05", 8, "Vaniele Caetano (Coord.), Stella de Souza Jesus (Mídia), Lara Mirelly (Log.), Jade Kerolyng Andrade Da Costa, Maria Heloísa Costa (Prog.), Mariana Teixeira (Prog.), Évani Flávia (Prog.), Maria Clara Barbalho Monteiro"],
-          ["06", 8, "Camille Barbosa B. A. Soares (Mídia), Liedyna de Oliveira Lucena (Mídia), Cecília Oliveira (TI), Maria Anunciação Belo (TI), Juliane Gabrielle G. Morais (TI), Liciane Oliveira (Log.), Anna Karolayne de Castro Simões, Gislianne da Silva Moura"]
-        ]
-      },
-      {
-        name: "Participantes Solteiras",
-        rows: [
-          ["01", 8, "Ana Lúcia Deus Erzinger, VALDILAINE CRUZ, Maria Theresa Barbalho Monteiro, Janny Kattlyng Andrade da Costa, Raquel Mariângela Cruz do Nascimento, Jéssica Ernesto Martins, Luzia Juliana Ferreira dos Anjos, Antônia Bruna Araújo Dos Santos"],
-          ["07", 8, "Jamily Naomi da Silva Lima, Kimberly Julia Gonzaga da Silva, Agnės Jasmine Borges Guedes, Vanessa Oliveira Ibiapina, Mariane Silva de Araújo, Ana Beatriz de Souza Vieira, Laura Silva de Medeiros, Marta Maia de Sousa"],
-          ["08", 8, "Renata do Nascimento, Maria Luiza Filgueira Gomes de Sousa, Ana Kelly Cypriano de Oliveira, Angela Arnaud de Sousa Monteiro da Silva, Julia Gabrielly Santiago Medeiros, Rosymeire Egildo da Silva, Laura Beatriz Tavares de Castro, Luz María Ludueña"],
-          ["09", 8, "Maria José da Conceição Lima, Marina Aguero, Vanessa de Souza Targino, Amanda Huana da Silva Santos, Heloisa Laura Farias Oliveira, Jéssica Cecília Amorim Silva, Julia Elice Peres de França Ribeiro, Maria Heloysa Santos da Silva"],
-          ["10", 8, "Ana Paula da Silva Costa, Clara Letícia Alcantara Sousa, Francimara Damasceno da Silva, Maria Júlia Melo da Silva, Dayane Patricia da Silva, Debora Patricia, Samara Lissandra Pinto Silva, Jessica Luana Fernandes Pereira"],
-          ["11", 8, "Maria Clara Silveira Fernandes, Rebeca Raabe da Cunha, Camilly Vitória Gomes da Silva, Maria Beatriz Bezerra Felipe, Tamara Emily de Nascimento, Lilian Cabral Rebouças, Janayna Santos da Silva, Maria Eduarda Ramos Fernandes"],
-          ["12", 8, "Renata Gabriele Barbosa Batista, Emily Pereira da Silva, Iasmim Caroline Davi De Brito, Leticia Emily Dantas Do Nascimento, Nathalia Rodrigues Silva, Sabrina Gomes da Silva, Ana Carolina Costa Da Silva, Leila Dalva Dos Santos Nascimento"],
-          ["13", 8, "Rhanne Souza, Gabrielly de Araújo Alexandre, Vitória Lira da Silva, Sara María de Lima Souza, Gisliane Kyvia Monteiro Lima, Maria Eduarda da Silva Correia, Sabrina Kamily Macedo Silva, Samára Erika Bezerra Nunes"],
-          ["14", 9, "Yasmim de Lima Bazilio, Maria Elinete Quirino Dos Santos, Samira Kathleen, Débora Letícia Ribeiro dos Santos, Jamile Medeiros de Araujo, Marjorie Trigueiro de Oliveira, Tereza Raquel Dos Santos Carmo, Davila Medeiros Fernandes Lopes, Ilane Soares Da Silva"]
-        ]
-      }
-    ]
-  },
-  {
-    cls: "masc",
-    title: "Ala Masculina",
-    note: "104 de 108 vagas ocupadas · 4 vagas livres no bangalô 16",
-    brk: true,
-    groups: [
-      {
-        name: "Liderança Masculina",
-        isLead: true,
-        rows: [
-          ["15", 8, "Breno Cesar (Coord.), Flávio Silva (Log.), Nicolas Daniel Vale dos Santos (Log.), Arifran Felix da Cruz (Log.), André Linhares (Prog.), Jonas Cauã (Prog.), Caio César Ataíde Ferreira (Mídia), Pedro Henrique Silva do Nascimento (Mídia)"],
-          ["16", 8, "Emanuel Victor R. Nascimento (TI), Liedson Lima dos Santos (TI), Wallyson Francelino (Saúde), José Victor Batista Arruda"]
-        ]
-      },
-      {
-        name: "Participantes Solteiros",
-        rows: [
-          ["17", 8, "Alan Jeferson de Souza Freitas, Pedro Wallace Nelo Gomes, Tiago Henrique da Silva Freitas, Angelo Moroni de Andrade Lima, Chrystian Thales Santos da Hora, Isaque Samuel Silva Assis, Nicholas Longo Ribeiro, Carlos Igor dos Santos Braz"],
-          ["18", 8, "João Pedro Teixeira Vieira, Renan Maia de Sousa, Silvio Mario Cavalcanti Gameiro de Moura Neto, Christian Mickael da Silva Paula, Denilson Medeiros da Costa, Leandro Oliveira, Luis Henrique Damasceno dos Santos, Facundo Jesús Argel"],
-          ["19", 8, "Juan Pablo da Costa Belo, Marlon Natan da Silva Felix, Matheus Gonçalo de Oliveira, Chagas Lima, Douglas Luiz Gomes da Cunha, Fabio Lucas Souza da Silva, Pedro Gabriel Lima de Melo, Abner Fernandes Costa"],
-          ["20", 8, "Antônio Vagner Bezerra Feitosa, Fernando Italo Da Silva Mendes, Gabriel Felinto Rodrigues, Gerson Peres de Oliveira, Moroni Torres Lopes de Figueiredo, Ricardo Miguel Cunha de Azevedo, Richard Oliveira da Silva, Ramon Cruz Marcolino"],
-          ["21", 8, "Alessandro de Assis Silva, Jerry Adriano Rodrigues Da Silva, Jonas Miguel Felix de Souza, Mikael Roberto de Souza Freitas, Antônio Eduardo Melo dos Santos, Marcus Vinícius da Silva, João Paulo Araújo Lima da Silva, Vitor Lira da Silva"],
-          ["22", 8, "Felipe Silva da Rocha Arnoud, Gabriel Medeiros Pereira, Paulo Henrique Ribeiro Dos Santos, Sammael Ives Chave Freire, Antonio de Oliveira Pinto, Kevyn Medeiros Felix, Levi Araujo Alves de Souza, Hilton Hugo Da Silva"],
-          ["29", 7, "Ryan Kauê De Carvalho Rodrigues, Vitor Matheus Alves da Trindade, Daniel Barbosa da Cruz, José Ricardo do Nascimento, Kleyton Silva dos Santos, Ygor Leonardo Alves Nogueira, Aryon Daniel Ferreira da Silva"],
-          ["30", 7, "Pedro Henrique Alves Pereira Da Silva, Gabriel Araújo, Luigi Bounocore de Lima, Matheus Erik Silva Lima, Vitor Oliveira das Neves, Anderson Sales Beserra, Guilherme Basilio da Silva"],
-          ["31", 7, "Luis Henrique Soares Ferreira da Silva, Alexandre Clemente Ferreira, Daniel Dos Santos Gadelha, Francisco Eliezer Fernandes Tomaz, Gilderlay Dantas Da Costa, Jordan Ellias de Sena Moreira Pereira, Moroni Esdras Maria Araujo"],
-          ["32", 7, "Tiago Tayrone Silva de Medeiros Targino Filho, Victor Hugo Da Silva, Saulo Nunes Alves, Francisco Hélio Costa, Gabriel Giovanni da Silva, Salustiano Faustino de Oliveira, Admilson Dino jr Silva"],
-          ["33", 8, "Daniel Gomes Da Rocha, Francisco Leaci de Paiva Gomes Junior, João Henrique Silva Dantas Damasceno, João Victor de Freitas Morais, Victor Emanoel Leite da Silva, Vinicius Emanoel Leite da Silva, Wesley Wagner Maia Varela, Marcos Antônio Melo de Morais"],
-          ["34", 8, "Maycon Augusto De Melo Morais, Jadson Bezerra do Nascimento Jacome, Johan Alexis Valencia Morcillo, Robson Samuel Nunes de Maria, Eduardo Alexandre dos Santos Pontes, Gabriel Dias Silva, João Victor Martins de França, Wendell Gabriel Romão da Silva"]
-        ]
-      }
-    ]
-  }
+// Base de Dados Exemplo
+const PARTICIPANTS = [
+  { id: "01", name: "Liciane Oliveira", role: "Organização", category: "vip", checkedIn: true },
+  { id: "02", name: "Breno Cesar", role: "Coordenador", category: "vip", checkedIn: false },
+  { id: "03", name: "Mariana Teixeira", role: "Participante", category: "standard", checkedIn: false }
 ];
 
-// Auxiliares Robustos
-const toArray = obj => (!obj ? [] : Array.isArray(obj) ? obj : Object.values(obj));
-const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-const el = (t, c, x) => {
-  const e = document.createElement(t);
-  if (c) e.className = c;
-  if (x != null) e.textContent = x;
-  return e;
-};
+let activeFilter = 'all';
 
-// Conexão Firebase Segura
-const firebaseConfig = { databaseURL: "https://cjas-2026-default-rtdb.firebaseio.com/" };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-let currentData = INITIAL_DATA;
-let checkins = {};
-let adminPass = 'cjas2026';
-let isLoggedIn = sessionStorage.getItem('cjas_logged') === 'true';
-let personToTransfer = null;
-let html5QrcodeScanner = null;
-
-// Navegação entre Telas
+// Navegação entre Telas SPA
 function showScreen(screenId) {
   document.getElementById('screen-home').style.display = screenId === 'home' ? 'block' : 'none';
   document.getElementById('screen-badge').style.display = screenId === 'badge' ? 'block' : 'none';
-  document.getElementById('screen-distribution').style.display = screenId === 'distribution' ? 'block' : 'none';
-  window.scrollTo(0,0);
-}
-
-// Sincronização em Tempo Real com Fallback Local
-db.ref('cjas_data').on('value', snapshot => {
-  const val = snapshot.val();
-  if (val) {
-    currentData = val;
-  } else {
-    db.ref('cjas_data').set(INITIAL_DATA);
-    currentData = INITIAL_DATA;
-  }
-  renderApp();
-  if (isLoggedIn) renderAdminTable();
-}, err => {
-  console.warn("Firebase offline/não alcançado, carregando dados locais:", err);
-  currentData = INITIAL_DATA;
-  renderApp();
-});
-
-db.ref('cjas_checkins').on('value', snapshot => {
-  checkins = snapshot.val() || {};
-  renderApp();
-  if (isLoggedIn) renderAdminTable();
-  updateKPIs();
-});
-
-db.ref('cjas_pass').on('value', snapshot => {
-  if (snapshot.val()) adminPass = snapshot.val();
-});
-
-function updateKPIs() {
-  const totalChecked = Object.values(checkins).filter(Boolean).length;
-  const statEl = document.getElementById('stat-checkins');
-  if (statEl) statEl.textContent = totalChecked;
+  document.getElementById('screen-list').style.display = screenId === 'list' ? 'block' : 'none';
+  window.scrollTo(0, 0);
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-// BUSCA DE PARTICIPANTE
-function findPerson(query) {
-  if (!query) return null;
-  const term = norm(query.trim());
-  if (!term) return null;
+// Busca e Geração de Crachá
+function handleSearch(e) {
+  e.preventDefault();
+  const query = document.getElementById('input-search-name').value.toLowerCase().trim();
+  const person = PARTICIPANTS.find(p => p.name.toLowerCase().includes(query));
 
-  let found = null;
+  if (person) {
+    document.getElementById('badge-name').textContent = person.name;
+    document.getElementById('badge-role').textContent = person.role;
 
-  toArray(currentData).forEach(sec => {
-    toArray(sec.groups).forEach(g => {
-      toArray(g.rows).forEach(row => {
-        if (!row) return;
-        const id = row[0];
-        const cap = row[1];
-        const raw = row[2];
-        if (!raw) return;
+    // Gerar QR Code
+    const qrBox = document.getElementById('qrcode-container');
+    qrBox.innerHTML = '';
+    const qrText = `ID: ${person.id} | Name: ${person.name}`;
 
-        let names = [];
-        if (sec.cls === "casal") {
-          const m = String(raw).match(/^(.*)\s\(([^)]+)\)$/);
-          if (m) names = m[1].split(" & ");
-          else names = String(raw).split(" & ");
-        } else {
-          names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
-        }
-
-        names.forEach(p => {
-          const rawName = String(p);
-          const cleanName = rawName.replace(/\s*\([^)]+\)/g, "").trim();
-
-          if (norm(cleanName).includes(term) || norm(rawName).includes(term)) {
-            const cleanRoommates = names.map(n => String(n).replace(/\s*\([^)]+\)/g, "").trim());
-            found = {
-              person: cleanName,
-              room: id,
-              roommates: cleanRoommates.filter(rn => norm(rn) !== norm(cleanName))
-            };
-          }
-        });
-      });
-    });
-  });
-
-  return found;
-}
-
-function handleHomeSearch(e) {
-  if (e) e.preventDefault();
-  const input = document.getElementById('home-name-input');
-  if (!input) return;
-  const query = input.value.trim();
-  
-  const match = findPerson(query);
-
-  if (match) {
-    document.getElementById('badge-person-name').textContent = match.person;
-    document.getElementById('badge-room-tag').textContent = `Bangalô Nº ${match.room}`;
-
-    const roommatesUl = document.getElementById('badge-roommates-list');
-    if (match.roommates.length > 0) {
-      roommatesUl.innerHTML = match.roommates.map(m => `<li>${m}</li>`).join('');
+    if (typeof QRCode !== 'undefined') {
+      new QRCode(qrBox, { text: qrText, width: 160, height: 160 });
     } else {
-      roommatesUl.innerHTML = '<li>Nenhum outro colega de quarto.</li>';
-    }
-
-    // Gerar QR Code com Fallback Garanta
-    const qrContainer = document.getElementById('qrcode-view');
-    qrContainer.innerHTML = '';
-    const qrText = `${match.person} | Bangalô ${match.room}`;
-    
-    try {
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(qrContainer, { text: qrText, width: 160, height: 160 });
-      } else {
-        throw new Error('Lib QRCode ausente');
-      }
-    } catch(err) {
-      qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrText)}" alt="QR Code">`;
+      qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrText)}" alt="QR Code">`;
     }
 
     showScreen('badge');
   } else {
-    alert('Participante não encontrado! Tente buscar apenas pelo primeiro nome (Ex: Liciane ou Breno).');
+    alert('Participante não encontrado!');
   }
 }
 
-// Renderizar Bangalôs na Lista
-function formatPersonLi(txt) {
-  const li = el("li");
-  const m = String(txt).match(/^(.*?)\s*\(([^)]+)\)$/);
-  const name = m ? m[1] : txt;
-  const role = m ? m[2] : null;
+// Renderização da Lista
+function renderList() {
+  const container = document.getElementById('list-container');
+  container.innerHTML = '';
 
-  li.dataset.raw = norm(name + (role ? " " + role : ""));
-  li.append(document.createTextNode(name));
+  let total = 0;
+  let checkins = 0;
 
-  if (role) {
-    li.append(el("span", "role-badge", role));
-  }
-  if (checkins[name.trim()]) {
-    li.append(el("span", "check-tag", "Check-in"));
-  }
-  return li;
+  PARTICIPANTS.forEach(item => {
+    total++;
+    if (item.checkedIn) checkins++;
+
+    const card = document.createElement('div');
+    card.className = 'card-box';
+    card.style.cssText = 'max-width:100%; text-align:left; padding:1rem; margin-bottom:0.8rem; display:flex; justify-content:space-between; align-items:center;';
+    card.dataset.name = item.name.toLowerCase();
+    card.dataset.category = item.category;
+
+    card.innerHTML = `
+      <div>
+        <strong>${item.name}</strong>
+        <span style="display:block; font-size:0.8rem; color:var(--muted);">${item.role}</span>
+      </div>
+      <div>
+        <span style="font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:6px; background:${item.checkedIn ? 'var(--success-bg)' : 'var(--bg)'}; color:${item.checkedIn ? 'var(--success)' : 'var(--muted)'};">
+          ${item.checkedIn ? 'CHECK-IN' : 'PENDENTE'}
+        </span>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-checkins').textContent = checkins;
 }
 
-function renderBangaloCard(sec, group, row) {
-  const id = row[0];
-  const cap = row[1];
-  const raw = row[2];
+// Filtros
+function filterList() {
+  const term = document.getElementById('q-filter').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('#list-container .card-box');
 
-  const isCasal = sec.cls === "casal";
-  let names = [], role = null;
+  cards.forEach(card => {
+    const matchesSearch = card.dataset.name.includes(term);
+    const matchesCategory = activeFilter === 'all' || card.dataset.category === activeFilter;
 
-  if (isCasal) {
-    const m = String(raw).match(/^(.*)\s\(([^)]+)\)$/);
-    if (m) {
-      names = m[1].split(" & ");
-      role = m[2];
-    } else {
-      names = String(raw).split(" & ");
-    }
-  } else {
-    names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
-  }
-
-  const card = el("div", `bangalo-card ${sec.cls}`);
-  card.dataset.id = id;
-  card.dataset.cls = sec.cls;
-  card.dataset.isLead = group.isLead || isCasal ? "true" : "false";
-  card.dataset.search = norm(`bangalo ${id} ${names.join(" ")} ${role || ''}`);
-
-  const numBox = el("div", "bangalo-num");
-  numBox.append(el("small", null, "Bangalô"), el("b", null, id));
-
-  const ul = el("ul", "occupants");
-  names.forEach(p => ul.append(formatPersonLi(p)));
-
-  if (role) {
-    const li = el("li");
-    li.append(el("span", "role-badge", role));
-    ul.append(li);
-  }
-
-  const free = cap - names.length;
-  let capBadge;
-  if (isCasal || free <= 0) {
-    capBadge = el("div", "cap-badge full", `${names.length} de ${cap} · Completo`);
-  } else {
-    capBadge = el("div", "cap-badge free", `${names.length} de ${cap} · ${free} ${free === 1 ? 'vaga livre' : 'vagas livres'}`);
-  }
-
-  card.append(numBox, ul, capBadge);
-  return card;
+    card.style.display = matchesSearch && matchesCategory ? 'flex' : 'none';
+  });
 }
 
-function renderApp() {
-  const app = document.getElementById("app");
-  if (!app) return;
-  app.innerHTML = '';
-
-  toArray(currentData).forEach(sec => {
-    const wing = el("section", `wing ${sec.cls}${sec.brk ? " break-before" : ""}`);
-    wing.dataset.cls = sec.cls;
-
-    const header = el("div", "wing-header");
-    const titleBox = el("div", "wing-title");
-    titleBox.append(el("h2", null, sec.title), el("span", "note", sec.note));
-    header.append(titleBox);
-
-    let totalBeds = 0;
-    toArray(sec.groups).forEach(g => {
-      toArray(g.rows).forEach(r => { if (r && r[1]) totalBeds += Number(r[1]); });
-    });
-    header.append(el("span", "wing-badge", `${totalBeds} leitos totais`));
-    wing.append(header);
-
-    toArray(sec.groups).forEach(g => {
-      const groupDiv = el("div", "group-container");
-      groupDiv.dataset.isLead = g.isLead || sec.cls === "casal" ? "true" : "false";
-
-      if (g.name) {
-        groupDiv.append(el("div", "subgroup-title", g.name));
-      }
-      toArray(g.rows).forEach(rw => {
-        if (rw) groupDiv.append(renderBangaloCard(sec, g, rw));
-      });
-      wing.append(groupDiv);
-    });
-
-    app.append(wing);
-  });
-
-  filterCards();
-}
-
-const q = document.getElementById("q");
-const emptyMsg = document.getElementById("empty");
-let currentFilter = "all";
-
-function filterCards() {
-  if (!q) return;
-  const term = norm(q.value.trim());
-  let visibleCount = 0;
-
-  document.querySelectorAll(".bangalo-card").forEach(card => {
-    const matchSearch = !term || card.dataset.search.includes(term);
-    let matchCategory = true;
-
-    if (currentFilter === "casal") matchCategory = card.dataset.cls === "casal";
-    else if (currentFilter === "fem") matchCategory = card.dataset.cls === "fem";
-    else if (currentFilter === "masc") matchCategory = card.dataset.cls === "masc";
-    else if (currentFilter === "lead") matchCategory = card.dataset.isLead === "true";
-
-    const isVisible = matchSearch && matchCategory;
-    card.style.display = isVisible ? "" : "none";
-    if (isVisible) visibleCount++;
-
-    card.querySelectorAll(".occupants li").forEach(li => {
-      const isHit = term.length > 1 && li.dataset.raw && li.dataset.raw.includes(term);
-      li.classList.toggle("hit", isHit);
-    });
-  });
-
-  document.querySelectorAll(".group-container").forEach(g => {
-    const hasVisible = [...g.querySelectorAll(".bangalo-card")].some(c => c.style.display !== "none");
-    g.style.display = hasVisible ? "" : "none";
-  });
-
-  document.querySelectorAll(".wing").forEach(w => {
-    const hasVisible = [...w.querySelectorAll(".bangalo-card")].some(c => c.style.display !== "none");
-    w.style.display = hasVisible ? "" : "none";
-  });
-
-  if (emptyMsg) emptyMsg.style.display = visibleCount === 0 ? "block" : "none";
-}
-
-if (q) q.addEventListener("input", filterCards);
-
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (!btn.dataset.filter) return;
-    document.querySelectorAll(".filter-btn").forEach(b => {
-      if (b.dataset.filter) b.classList.remove("active");
-    });
-    btn.classList.add("active");
-    currentFilter = btn.dataset.filter;
-    filterCards();
-  });
-});
-
-/* PAINEL DE LIDERANÇA / ADMIN */
-function openAdminArea() {
-  if (isLoggedIn) openModal('modal-admin-panel');
-  else openModal('modal-login');
+function setCategoryFilter(cat, btn) {
+  document.querySelectorAll('.control-bar .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = cat;
+  filterList();
 }
 
 function handleAdminLogin(e) {
   e.preventDefault();
-  const u = document.getElementById('admin-user').value;
-  const p = document.getElementById('admin-pass').value;
-
-  if (u === 'admincjas' && p === adminPass) {
-    isLoggedIn = true;
-    sessionStorage.setItem('cjas_logged', 'true');
-    closeModal('modal-login');
-    openModal('modal-admin-panel');
-    renderAdminTable();
-  } else {
-    alert('Usuário ou senha incorretos!');
-  }
+  alert('Painel administrativo autenticado!');
+  closeModal('modal-login');
 }
 
-function logoutAdmin() {
-  isLoggedIn = false;
-  sessionStorage.removeItem('cjas_logged');
-  closeModal('modal-admin-panel');
-}
-
-function renderAdminTable() {
-  const tbody = document.getElementById('admin-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  const searchInput = document.getElementById('admin-search-input');
-  const term = norm(searchInput ? searchInput.value.trim() : '');
-
-  toArray(currentData).forEach(sec => {
-    toArray(sec.groups).forEach(g => {
-      toArray(g.rows).forEach(row => {
-        if (!row) return;
-        const id = row[0];
-        const raw = row[2];
-
-        let names = [];
-        if (sec.cls === "casal") {
-          const m = String(raw).match(/^(.*)\s\(([^)]+)\)$/);
-          if (m) names = m[1].split(" & ");
-          else names = String(raw).split(" & ");
-        } else {
-          names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
-        }
-
-        names.forEach(person => {
-          const cleanName = String(person).replace(/\s*\([^)]+\)/g, "").trim();
-          if (term && !norm(cleanName).includes(term) && !norm(id).includes(term)) return;
-
-          const tr = el('tr');
-          const safeName = cleanName.replace(/'/g, "\\'");
-          tr.innerHTML = `
-            <td>
-              <input type="checkbox" ${checkins[cleanName] ? 'checked' : ''} onchange="toggleCheckin('${safeName}', this.checked)">
-            </td>
-            <td><b>${cleanName}</b></td>
-            <td>Bangalô ${id}</td>
-            <td>
-              <button class="filter-btn" style="padding:0.2rem 0.5rem; font-size:0.72rem;" onclick="openTransferModal('${safeName}', '${id}')">Transferir</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      });
-    });
-  });
-}
-
-function toggleCheckin(person, isChecked) {
-  db.ref(`cjas_checkins/${person}`).set(isChecked);
-}
-
-/* LEITOR DE QR CODE VIA CÂMERA */
-function startScanner() {
-  openModal('modal-scanner');
-  html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 200, height: 200 } }, false);
-  html5QrcodeScanner.render(onScanSuccess, () => {});
-}
-
-function onScanSuccess(decodedText) {
-  const match = findPerson(decodedText);
-  if (match) {
-    toggleCheckin(match.person, true);
-    alert(`CHECK-IN CONFIRMADO!\n\nHóspede: ${match.person}\nBangalô: ${match.room}`);
-  } else {
-    alert(`QR Code lido: "${decodedText}"\nNenhum participante correspondente foi encontrado.`);
-  }
-  stopScanner();
-}
-
-function stopScanner() {
-  if (html5QrcodeScanner) {
-    html5QrcodeScanner.clear().catch(e => console.error(e));
-  }
-  closeModal('modal-scanner');
-}
-
-/* TRANSFERÊNCIA E SENHA */
-function openTransferModal(person, currentRoom) {
-  personToTransfer = { person, currentRoom };
-  document.getElementById('transfer-person-name').textContent = `${person} (Atualmente no Bangalô ${currentRoom})`;
-  const select = document.getElementById('transfer-select-room');
-  select.innerHTML = '';
-
-  toArray(currentData).forEach(sec => {
-    toArray(sec.groups).forEach(g => {
-      toArray(g.rows).forEach(row => {
-        if (!row) return;
-        const id = row[0];
-        const cap = row[1];
-        const raw = row[2];
-        let names = typeof raw === "string" ? raw.split(", ") : toArray(raw);
-        
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = `Bangalô ${id} (${names.length}/${cap})`;
-        if (id === currentRoom) option.selected = true;
-        select.appendChild(option);
-      });
-    });
-  });
-  openModal('modal-transfer');
-}
-
-function confirmTransfer() {
-  const newRoomId = document.getElementById('transfer-select-room').value;
-  if (!personToTransfer || newRoomId === personToTransfer.currentRoom) {
-    closeModal('modal-transfer');
-    return;
-  }
-
-  toArray(currentData).forEach(sec => {
-    toArray(sec.groups).forEach(g => {
-      toArray(g.rows).forEach(row => {
-        if (!row) return;
-        let names = typeof row[2] === "string" ? row[2].split(", ") : toArray(row[2]);
-
-        if (row[0] === personToTransfer.currentRoom) {
-          names = names.filter(p => !p.includes(personToTransfer.person));
-          row[2] = names.join(", ");
-        }
-        if (row[0] === newRoomId) {
-          names.push(personToTransfer.person);
-          row[2] = names.join(", ");
-        }
-      });
-    });
-  });
-
-  db.ref('cjas_data').set(currentData);
-  closeModal('modal-transfer');
-  alert(`Transferência de ${personToTransfer.person} salva na nuvem!`);
-}
-
-function handleChangePassword(e) {
-  e.preventDefault();
-  const newP = document.getElementById('new-pass-input').value;
-  db.ref('cjas_pass').set(newP);
-  alert('Nova senha salva com sucesso!');
-  closeModal('modal-change-pass');
-}
-
-// Inicialização Garantida
+// Inicialização
 window.addEventListener('DOMContentLoaded', () => {
-  renderApp();
+  renderList();
 });
 </script>
 </body>
