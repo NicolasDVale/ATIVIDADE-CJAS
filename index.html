@@ -1,456 +1,230 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sistema de Gestão de Eventos & Credenciamento</title>
+  <meta charset="UTF-8">
+  <title>Gestão de Participantes e Documentos</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f8; color: #333; }
+    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { color: #1a73e8; margin-top: 0; }
+    
+    /* Container da Busca e Lista de Sugestões */
+    .search-container { position: relative; margin-bottom: 20px; }
+    .search-input { width: 100%; padding: 12px; box-sizing: border-box; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; }
+    .suggestions-list {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 1px solid #ccc; border-top: none;
+      max-height: 180px; overflow-y: auto; z-index: 10;
+      list-style: none; margin: 0; padding: 0; border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .suggestions-list li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+    .suggestions-list li:hover { background: #e8f0fe; color: #1a73e8; }
+    
+    /* Form Novo Participante */
+    .add-container { display: flex; gap: 10px; margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e0e0e0; }
+    .add-container input { flex: 1; }
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    /* Tabela de Participantes */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
+    th { background: #f8f9fa; font-weight: bold; color: #555; }
+    tr.highlight { background-color: #e8f0fe; }
+    
+    input[type="text"], input[type="file"] { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+    .btn-save { background: #1a73e8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-save:hover { background: #1557b0; }
+    .btn-add { background: #34a853; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-add:hover { background: #2d8e47; }
+    .btn-delete { background: #d93025; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-<!-- Gerador de QR Code -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<style>
-:root {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --line: #e2e8f0;
-
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-bg: #eff6ff;
-
-  --success: #10b981;
-  --success-bg: #ecfdf5;
-  --success-border: #a7f3d0;
-
-  --warning: #f59e0b;
-  --warning-bg: #fffbeb;
-
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
-  --radius: 16px;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: var(--font);
-  background-color: var(--bg);
-  color: var(--ink);
-  line-height: 1.5;
-  padding: 1.5rem 1rem 4rem;
-}
-.page { max-width: 1040px; margin: 0 auto; }
-
-/* Banner Principal */
-.masthead {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
-  color: #fff;
-  border-radius: 20px;
-  padding: 2.2rem 2.2rem 1.8rem;
-  box-shadow: var(--shadow-md);
-  margin-bottom: 1.4rem;
-  position: relative;
-  overflow: hidden;
-}
-.kicker {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 0.3rem 0.85rem;
-  border-radius: 999px;
-  margin-bottom: 0.85rem;
-  color: #cbd5e1;
-}
-.masthead h1 {
-  font-size: clamp(1.45rem, 3.6vw, 2.1rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-.sub {
-  margin-top: 0.4rem;
-  color: #94a3b8;
-  font-size: 0.95rem;
-}
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.2rem;
-}
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 999px;
-  padding: 0.35rem 0.85rem;
-  color: #e2e8f0;
-}
-
-/* Navegação */
-.nav-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.2rem;
-}
-.btn-back {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.15s;
-}
-.btn-back:hover { background: #e2e8f0; }
-
-/* Cards Principais */
-.card-box {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
-  max-width: 580px;
-  margin: 0 auto 2rem;
-  text-align: center;
-}
-.card-box h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem; }
-.card-box p { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; }
-
-.form-group { margin-bottom: 1rem; text-align: left; }
-.form-group label {
-  display: block; font-size: 0.78rem; font-weight: 700;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
-}
-.input-field {
-  width: 100%; border: 1px solid var(--line); background: var(--bg);
-  border-radius: 12px; padding: 0.8rem 1rem; font: inherit; font-size: 0.95rem;
-  color: var(--ink); transition: all 0.15s;
-}
-.input-field:focus {
-  outline: none; border-color: var(--primary); background: #fff;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-}
-
-.btn-primary {
-  width: 100%; border: 0; background: var(--ink); color: #fff;
-  font: inherit; font-size: 0.9rem; font-weight: 600; padding: 0.75rem 1.2rem;
-  border-radius: 10px; cursor: pointer; transition: background 0.15s;
-}
-.btn-primary:hover { background: #334155; }
-
-/* Grade de Indicadores (KPIs) */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 0.8rem;
-  margin-bottom: 1.4rem;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 0.9rem 1.1rem;
-  box-shadow: var(--shadow-sm);
-}
-.stat-card .val { font-size: 1.65rem; font-weight: 800; line-height: 1.1; }
-.stat-card .lbl {
-  font-size: 0.76rem; font-weight: 600; color: var(--muted);
-  text-transform: uppercase; margin-top: 0.25rem;
-}
-
-/* Barra de Filtro e Busca */
-.control-bar {
-  position: sticky; top: 0.8rem; z-index: 30;
-  background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px);
-  border: 1px solid var(--line); border-radius: 16px; padding: 0.6rem 0.8rem;
-  box-shadow: var(--shadow-md); margin-bottom: 1.8rem;
-  display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
-}
-.search-box { flex: 1; min-width: 220px; }
-.filter-btn {
-  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
-  font: inherit; font-size: 0.8rem; font-weight: 600; padding: 0.45rem 0.85rem;
-  border-radius: 999px; cursor: pointer; transition: all 0.15s;
-}
-.filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-/* QR Code Display */
-#qrcode-container {
-  display: flex; justify-content: center; align-items: center;
-  padding: 1rem; background: #fff; border-radius: 14px;
-  border: 1px solid var(--line); width: 180px; height: 180px; margin: 1rem auto;
-}
-
-/* Modais */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px); display: none; align-items: center;
-  justify-content: center; z-index: 100; padding: 1rem;
-}
-.modal-overlay.active { display: flex; }
-.modal {
-  background: var(--surface); border: 1px solid var(--line);
-  border-radius: 20px; max-width: 480px; width: 100%; padding: 1.8rem; position: relative;
-}
-.modal-close {
-  position: absolute; top: 1.2rem; right: 1.2rem;
-  background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted);
-}
-
-footer { margin-top: 3.5rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
-
-@media print {
-  .control-bar, .stats-grid, footer, .nav-bar, #screen-home { display: none !important; }
-  #screen-list { display: block !important; }
-  body { background: #fff; padding: 0; }
-}
-</style>
+    .file-status { display: block; font-size: 12px; color: #1e8e3e; margin-top: 4px; font-weight: bold; }
+  </style>
 </head>
 <body>
-<div class="page">
 
-  <!-- Header Banner -->
-  <header class="masthead">
-    <span class="kicker">Painel de Eventos</span>
-    <h1>Credenciamento & Gestão 2026</h1>
-    <p class="sub">Plataforma oficial de controle e acesso de participantes</p>
-    <div class="chips">
-      <span class="chip">Centro de Convenções</span>
-      <span class="chip">Outubro, 2026</span>
-    </div>
-  </header>
-
-  <!-- TELA 1: CONSULTA INICIAL -->
-  <main id="screen-home">
-    <div class="card-box">
-      <h2>Consultar Credencial</h2>
-      <p>Digite seu nome completo ou ID para visualizar seu crachá e QR Code de acesso.</p>
-      
-      <form onsubmit="handleSearch(event)">
-        <div class="form-group">
-          <input type="text" id="input-search-name" class="input-field" placeholder="Digite seu nome..." required>
-        </div>
-        <button type="submit" class="btn-primary">Gerar Crachá Digital</button>
-      </form>
-
-      <div style="margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--line); display: flex; gap: 0.5rem; flex-direction: column;">
-        <button class="filter-btn" onclick="showScreen('list')">Ver Lista Geral de Participantes</button>
-        <button class="filter-btn" onclick="openModal('modal-login')">Área Administrativa</button>
-      </div>
-    </div>
-  </main>
-
-  <!-- TELA 2: CRACHÁ DIGITAL RESULTADO -->
-  <main id="screen-badge" style="display:none;">
-    <div class="nav-bar">
-      <button class="btn-back" onclick="showScreen('home')">← Voltar para Busca</button>
-      <button class="filter-btn" onclick="showScreen('list')">Ver Lista Completa</button>
-    </div>
-
-    <div class="card-box" style="max-width: 480px;">
-      <span class="kicker" style="background:var(--bg); color:var(--muted); border-color:var(--line);">Credencial Oficial</span>
-      <h2 id="badge-name" style="margin-top:0.4rem;">---</h2>
-      <p id="badge-role" style="color:var(--primary); font-weight:700;">---</p>
-      
-      <!-- QR Code -->
-      <div id="qrcode-container"></div>
-
-      <button class="btn-primary" onclick="window.print()" style="margin-top:1rem;">Imprimir Crachá</button>
-    </div>
-  </main>
-
-  <!-- TELA 3: LISTA COMPLETA -->
-  <main id="screen-list" style="display:none;">
-    <div class="nav-bar">
-      <button class="btn-back" onclick="showScreen('home')">← Voltar ao Início</button>
-    </div>
-
-    <!-- Indicadores -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="val" id="stat-total">0</span>
-        <span class="lbl">Total Confirmados</span>
-      </div>
-      <div class="stat-card">
-        <span class="val" id="stat-checkins" style="color:var(--success);">0</span>
-        <span class="lbl">Check-ins Realizados</span>
-      </div>
-    </div>
-
-    <!-- Barra de Filtros -->
-    <div class="control-bar">
-      <div class="search-box">
-        <input type="search" id="q-filter" class="input-field" placeholder="Filtrar por nome ou setor..." oninput="filterList()" style="padding: 0.45rem 0.85rem;">
-      </div>
-      <button class="filter-btn active" onclick="setCategoryFilter('all', this)">Todos</button>
-      <button class="filter-btn" onclick="setCategoryFilter('vip', this)">VIP</button>
-      <button class="filter-btn" onclick="window.print()">Imprimir PDF</button>
-    </div>
-
-    <!-- Container dos Itens/Cards -->
-    <div id="list-container"></div>
-  </main>
-
-  <footer>
-    Sistema de Gestão & Credenciamento · 2026
-  </footer>
-</div>
-
-<!-- MODAL LOGIN -->
-<div class="modal-overlay" id="modal-login">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-login')">✕</button>
-    <h3 style="margin-bottom:0.5rem;">Acesso Restrito</h3>
-    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Entre com suas credenciais de organizador.</p>
-    <form onsubmit="handleAdminLogin(event)">
-      <div class="form-group">
-        <label>Usuário</label>
-        <input type="text" id="admin-user" class="input-field" required>
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" id="admin-pass" class="input-field" required>
-      </div>
-      <button type="submit" class="btn-primary">Entrar</button>
-    </form>
+<div class="container">
+  <h2>Adicionar Novo Participante</h2>
+  <div class="add-container">
+    <input type="text" id="novoNome" placeholder="Nome do participante...">
+    <input type="text" id="novoDoc" placeholder="RG ou CPF (opcional)...">
+    <button class="btn-add" onclick="adicionarParticipante()">Cadastrar</button>
   </div>
+
+  <h2>Buscar Participante</h2>
+  <div class="search-container">
+    <input type="text" id="search" class="search-input" placeholder="Digite um nome para filtrar..." autocomplete="off">
+    <ul id="suggestions" class="suggestions-list" style="display: none;"></ul>
+  </div>
+
+  <h2>Listagem para Inserção de Documentos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Número (RG/CPF)</th>
+        <th>Anexo do Documento</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="participantTable">
+      <!-- Linhas geradas via JavaScript -->
+    </tbody>
+  </table>
 </div>
 
 <script>
-// Base de Dados Exemplo
-const PARTICIPANTS = [
-  { id: "01", name: "Liciane Oliveira", role: "Organização", category: "vip", checkedIn: true },
-  { id: "02", name: "Breno Cesar", role: "Coordenador", category: "vip", checkedIn: false },
-  { id: "03", name: "Mariana Teixeira", role: "Participante", category: "standard", checkedIn: false }
-];
+  // Dados padrão caso o localStorage esteja vazio
+  const dadosIniciais = [
+    { id: 1, nome: "Maria Silva", documento: "123.456.789-00", arquivo: null },
+    { id: 2, nome: "Maria Oliveira", documento: "", arquivo: null },
+    { id: 3, nome: "Maria Fernanda Costa", documento: "", arquivo: null },
+    { id: 4, nome: "João Pedro Santos", documento: "987.654.321-11", arquivo: null },
+    { id: 5, nome: "Carlos Eduardo", documento: "", arquivo: null }
+  ];
 
-let activeFilter = 'all';
+  // Carrega do LocalStorage ou usa o padrão
+  let participantes = JSON.parse(localStorage.getItem('participantes_db')) || dadosIniciais;
 
-// Navegação entre Telas SPA
-function showScreen(screenId) {
-  document.getElementById('screen-home').style.display = screenId === 'home' ? 'block' : 'none';
-  document.getElementById('screen-badge').style.display = screenId === 'badge' ? 'block' : 'none';
-  document.getElementById('screen-list').style.display = screenId === 'list' ? 'block' : 'none';
-  window.scrollTo(0, 0);
-}
+  const searchInput = document.getElementById('search');
+  const suggestionsList = document.getElementById('suggestions');
+  const tableBody = document.getElementById('participantTable');
 
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+  function salvarNoStorage() {
+    localStorage.setItem('participantes_db', JSON.stringify(participantes));
+  }
 
-// Busca e Geração de Crachá
-function handleSearch(e) {
-  e.preventDefault();
-  const query = document.getElementById('input-search-name').value.toLowerCase().trim();
-  const person = PARTICIPANTS.find(p => p.name.toLowerCase().includes(query));
+  // Renderiza a tabela (filtrando a lista em vez de apenas destacar)
+  function renderTable(filterText = '') {
+    tableBody.innerHTML = '';
+    const query = filterText.toLowerCase().trim();
+    
+    participantes.forEach((p) => {
+      const match = p.nome.toLowerCase().includes(query);
+      
+      // Esconde linhas que não coincidem com o filtro digitado
+      if (query && !match) return;
 
-  if (person) {
-    document.getElementById('badge-name').textContent = person.name;
-    document.getElementById('badge-role').textContent = person.role;
+      const row = document.createElement('tr');
+      if (query && match) row.classList.add('highlight');
 
-    // Gerar QR Code
-    const qrBox = document.getElementById('qrcode-container');
-    qrBox.innerHTML = '';
-    const qrText = `ID: ${person.id} | Name: ${person.name}`;
+      const arquivoStatus = p.arquivo 
+        ? `<span class="file-status">✓ Anexado: ${p.arquivo}</span>` 
+        : '';
 
-    if (typeof QRCode !== 'undefined') {
-      new QRCode(qrBox, { text: qrText, width: 160, height: 160 });
-    } else {
-      qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrText)}" alt="QR Code">`;
+      row.innerHTML = `
+        <td><strong>${p.nome}</strong></td>
+        <td>
+          <input type="text" id="doc-${p.id}" value="${p.documento || ''}" placeholder="Digite RG ou CPF">
+        </td>
+        <td>
+          <input type="file" id="file-${p.id}">
+          ${arquivoStatus}
+        </td>
+        <td style="display: flex; gap: 6px;">
+          <button class="btn-save" onclick="salvarDocumento(${p.id})">Salvar</button>
+          <button class="btn-delete" onclick="excluirParticipante(${p.id})">Excluir</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Evento do campo de busca e autocompletar
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim().toLowerCase();
+    suggestionsList.innerHTML = '';
+
+    if (!query) {
+      suggestionsList.style.display = 'none';
+      renderTable();
+      return;
     }
 
-    showScreen('badge');
-  } else {
-    alert('Participante não encontrado!');
+    const matches = participantes.filter(p => p.nome.toLowerCase().includes(query));
+
+    if (matches.length > 0) {
+      matches.forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = p.nome;
+        
+        li.addEventListener('click', () => {
+          searchInput.value = p.nome;
+          suggestionsList.style.display = 'none';
+          renderTable(p.nome);
+        });
+        
+        suggestionsList.appendChild(li);
+      });
+      suggestionsList.style.display = 'block';
+    } else {
+      suggestionsList.style.display = 'none';
+    }
+
+    renderTable(query);
+  });
+
+  // Salva atualizações do registro
+  function salvarDocumento(id) {
+    const docInput = document.getElementById(`doc-${id}`).value;
+    const fileInput = document.getElementById(`file-${id}`).files[0];
+    
+    const participante = participantes.find(item => item.id === id);
+    if (participante) {
+      participante.documento = docInput;
+      if (fileInput) {
+        participante.arquivo = fileInput.name;
+      }
+      salvarNoStorage();
+      renderTable(searchInput.value);
+      alert(`Dados de "${participante.nome}" atualizados com sucesso!`);
+    }
   }
-}
 
-// Renderização da Lista
-function renderList() {
-  const container = document.getElementById('list-container');
-  container.innerHTML = '';
+  // Adiciona novo participante à lista
+  function adicionarParticipante() {
+    const nomeInput = document.getElementById('novoNome');
+    const docInput = document.getElementById('novoDoc');
+    
+    const nome = nomeInput.value.trim();
+    if (!nome) {
+      alert('Por favor, informe ao menos o nome do participante.');
+      return;
+    }
 
-  let total = 0;
-  let checkins = 0;
+    const novoId = participantes.length > 0 ? Math.max(...participantes.map(p => p.id)) + 1 : 1;
+    participantes.push({
+      id: novoId,
+      nome: nome,
+      documento: docInput.value.trim(),
+      arquivo: null
+    });
 
-  PARTICIPANTS.forEach(item => {
-    total++;
-    if (item.checkedIn) checkins++;
+    salvarNoStorage();
+    nomeInput.value = '';
+    docInput.value = '';
+    renderTable();
+  }
 
-    const card = document.createElement('div');
-    card.className = 'card-box';
-    card.style.cssText = 'max-width:100%; text-align:left; padding:1rem; margin-bottom:0.8rem; display:flex; justify-content:space-between; align-items:center;';
-    card.dataset.name = item.name.toLowerCase();
-    card.dataset.category = item.category;
+  // Exclui participante
+  function excluirParticipante(id) {
+    if (confirm('Deseja realmente remover este participante?')) {
+      participantes = participantes.filter(p => p.id !== id);
+      salvarNoStorage();
+      renderTable(searchInput.value);
+    }
+  }
 
-    card.innerHTML = `
-      <div>
-        <strong>${item.name}</strong>
-        <span style="display:block; font-size:0.8rem; color:var(--muted);">${item.role}</span>
-      </div>
-      <div>
-        <span style="font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:6px; background:${item.checkedIn ? 'var(--success-bg)' : 'var(--bg)'}; color:${item.checkedIn ? 'var(--success)' : 'var(--muted)'};">
-          ${item.checkedIn ? 'CHECK-IN' : 'PENDENTE'}
-        </span>
-      </div>
-    `;
-
-    container.appendChild(card);
+  // Esconde o menu de sugestões ao clicar fora
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-container')) {
+      suggestionsList.style.display = 'none';
+    }
   });
 
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-checkins').textContent = checkins;
-}
-
-// Filtros
-function filterList() {
-  const term = document.getElementById('q-filter').value.toLowerCase().trim();
-  const cards = document.querySelectorAll('#list-container .card-box');
-
-  cards.forEach(card => {
-    const matchesSearch = card.dataset.name.includes(term);
-    const matchesCategory = activeFilter === 'all' || card.dataset.category === activeFilter;
-
-    card.style.display = matchesSearch && matchesCategory ? 'flex' : 'none';
-  });
-}
-
-function setCategoryFilter(cat, btn) {
-  document.querySelectorAll('.control-bar .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeFilter = cat;
-  filterList();
-}
-
-function handleAdminLogin(e) {
-  e.preventDefault();
-  alert('Painel administrativo autenticado!');
-  closeModal('modal-login');
-}
-
-// Inicialização
-window.addEventListener('DOMContentLoaded', () => {
-  renderList();
-});
+  // Inicializa a tabela
+  renderTable();
 </script>
+
 </body>
 </html>
