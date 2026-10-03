@@ -99,6 +99,7 @@ footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
 @page{size:A4;margin:8mm}
 @media print{body{background:#fff;padding:0;font-size:8pt}.bar,.stats,.nav,footer,.empty,.ov,#home,#badge,#list,.notice,#toast,.noprint{display:none!important}body[data-s=list] #list,body[data-s=badge] #badge{display:block!important}.badge{box-shadow:none;margin-top:2rem}.masthead{padding:.6rem 1rem;box-shadow:none}.chips{display:none}.bcard{break-inside:avoid;padding:.35rem .6rem;box-shadow:none}.wing.break{break-before:page}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
+<base target="_blank">
 </head>
 <body>
 <div class="page">
@@ -181,7 +182,7 @@ footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
     <button class="btn btn-p btn-sm" id="t-add">Novo participante</button>
     <button class="btn btn-s btn-sm" id="t-csv">Exportar planilha</button>
     <button class="btn btn-s btn-sm" id="t-note">Publicar aviso</button>
-    <button class="btn btn-s btn-sm" id="t-pass">Alterar senha</button>
+    <button class="btn btn-s btn-sm" id="t-swap">Trocar participantes</button><button class="btn btn-s btn-sm" id="t-pass">Alterar senha</button>
     <button class="btn btn-d btn-sm" id="t-out">Sair</button>
   </div>
   <input id="as" type="search" placeholder="Filtrar por nome ou bangalô">
@@ -200,8 +201,8 @@ const INITIAL_DATA=[
 ["05",8,"Vaniele Caetano (Coord.), Stella de Souza Jesus (Mídia), Lara Mirelly (Log.), Jade Kerolyng Andrade Da Costa, Maria Heloísa Costa (Prog.), Mariana Teixeira (Prog.), Évani Flávia (Prog.), Maria Clara Barbalho Monteiro"],
 ["06",8,"Camille Barbosa B. A. Soares (Mídia), Liedyna de Oliveira Lucena (Mídia), Cecília Oliveira (TI), Maria Anunciação Belo (TI), Juliane Gabrielle G. Morais (TI), Liciane Oliveira (Log.), Anna Karolayne de Castro Simões, Gislianne da Silva Moura"]]},
 {name:"Participantes solteiras",rows:[
-["01",8,"Ana Lúcia Deus Erzinger, Valdilaine Cruz, Marta Maia de Sousa, Janny Kattlyng Andrade da Costa, Raquel Mariângela Cruz do Nascimento, Jéssica Ernesto Martins, Luzia Juliana Ferreira dos Anjos, Antônia Bruna Araújo Dos Santos"],
-["07",8,"Jamily Naomi da Silva Lima, Kimberly Julia Gonzaga da Silva, Agnės Jasmine Borges Guedes, Vanessa Oliveira Ibiapina, Mariane Silva de Araújo, Ana Beatriz de Souza Vieira, Laura Silva de Medeiros, Maria Theresa Barbalho Monteiro"],
+["01",8,"Ana Lúcia Deus Erzinger, VALDILAINE CRUZ, Maria Theresa Barbalho Monteiro, Janny Kattlyng Andrade da Costa, Raquel Mariângela Cruz do Nascimento, Jéssica Ernesto Martins, Luzia Juliana Ferreira dos Anjos, Antônia Bruna Araújo Dos Santos"],
+["07",8,"Jamily Naomi da Silva Lima, Kimberly Julia Gonzaga da Silva, Agnės Jasmine Borges Guedes, Vanessa Oliveira Ibiapina, Mariane Silva de Araújo, Ana Beatriz de Souza Vieira, Laura Silva de Medeiros, Marta Maia de Sousa"],
 ["08",8,"Renata do Nascimento, Maria Luiza Filgueira Gomes de Sousa, Ana Kelly Cypriano de Oliveira, Angela Arnaud de Sousa Monteiro da Silva, Julia Gabrielly Santiago Medeiros, Rosymeire Egildo da Silva, Laura Beatriz Tavares de Castro, Luz María Ludueña"],
 ["09",8,"Maria José da Conceição Lima, Marina Aguero, Vanessa de Souza Targino, Amanda Huana da Silva Santos, Heloisa Laura Farias Oliveira, Jéssica Cecília Amorim Silva, Julia Elice Peres de França Ribeiro, Maria Heloysa Santos da Silva"],
 ["10",8,"Ana Paula da Silva Costa, Clara Letícia Alcantara Sousa, Francimara Damasceno da Silva, Maria Júlia Melo da Silva, Dayane Patricia da Silva, Debora Patricia, Samara Lissandra Pinto Silva, Jessica Luana Fernandes Pereira"],
@@ -252,7 +253,7 @@ function rooms(){const out=[];toArr(data).forEach(sec=>toArr(sec.groups).forEach
 })));return out}
 const people=()=>rooms().flatMap(r=>r.list.map(e=>({entry:e,name:clean(e),r})));
 const allNames=()=>[...new Set(people().map(p=>p.name))];
-const save=()=>db.ref("cjas_data").set(data).catch(e=>{console.error("Erro no Firebase:",e);toast("Erro ao salvar no banco de dados.");});
+const save=()=>db.ref("cjas_data").set(data);
 const getDoc=n=>{const v=docs[key(n)];return v&&typeof v==="object"?v.documento||"":v||""};
 
 db.ref("cjas_data").on("value",s=>{const v=s.val();if(v)data=v;else db.ref("cjas_data").set(INITIAL_DATA);refresh()},
@@ -318,8 +319,8 @@ function card(r,g){const free=r.cap-r.list.length;
   const ul=mk("ul","occ");
   r.list.forEach(e=>{const li=mk("li");const nm=clean(e),rl=roleOf(e);li.dataset.s=norm(e);li.append(nm);if(rl)li.append(mk("span","role",rl));ul.append(li)});
   if(r.role){const li=mk("li");li.append(mk("span","role",r.role));ul.append(li)}
-  const full=r.casal||free<=0;
-  const cap=mk("div","cap"+(full?"":" free"),full?`${r.list.length} de ${r.cap} · completo`:`${r.list.length} de ${r.cap} · ${free} ${free===1?"vaga livre":"vagas livres"}`);
+  let capTxt,capCls="";if(free<0){capTxt=`${r.list.length} de ${r.cap} · ${Math.abs(free)} acima do limite`}else if(r.casal||free===0){capTxt=`${r.list.length} de ${r.cap} · completo`}else{capTxt=`${r.list.length} de ${r.cap} · ${free} ${free===1?"vaga livre":"vagas livres"}`;capCls=" free"}
+  const cap=mk("div","cap"+capCls,capTxt);
   const f=mk("div","fill");f.style.width=Math.min(100,Math.round(r.list.length/r.cap*100))+"%";
   c.append(n,ul,cap,f);return c}
 
@@ -366,22 +367,24 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     const s=mk("button","btn btn-p btn-sm","Salvar");s.onclick=()=>{db.ref("cjas_docs/"+key(p.name)).set(inp.value.trim());toast("Documento salvo.")};
     const m=mk("button","btn btn-s btn-sm","Mudar");m.onclick=()=>transfer(p);
     const x=mk("button","btn btn-d btn-sm","Excluir");x.onclick=()=>removePerson(p);
-    const w=mk("div","acts");w.append(s,m,x);ac.append(w);
+    const sw=mk("button","btn btn-s btn-sm","Trocar");sw.onclick=()=>swapPerson(p);
+    const w=mk("div","acts");w.append(s,m,sw,x);ac.append(w);
     tr.append(a,b,d,ac);tb.append(tr)})}
 
-function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title} (${r.list.length}/${r.cap})`])}
+function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title} (${r.list.length}/${r.cap})${r.id===cur?" · atual":""}${r.list.length>=r.cap?" · cheio":""}`])}
 const setRoom=(r,list)=>{r.row[2]=list.join(", ")};
 
 $("t-add").onclick=()=>ask("Novo participante",[
   {label:"Nome completo",ph:"Ex.: João da Silva"},{label:"Bangalô",options:roomOptions()}],"Adicionar",(name,id)=>{
   name=name.trim();const r=rooms().find(x=>x.id===id);
-  if(!name||!r){toast("Selecione um bangalô válido.");return false}
+  if(!name||!r){toast("Preencha o nome e escolha um bangalô.");return false}
   if(allNames().some(n=>norm(n)===norm(name))){toast("Já existe um participante com esse nome.");return false}
-  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Selecione o bangalô desejado.");
+  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, mesmo os completos.");
 
 function transfer(p){ask("Mudar de bangalô",[{label:p.name,options:roomOptions(p.r.id),value:p.r.id}],"Confirmar mudança",id=>{
   if(id===p.r.id)return;const dest=rooms().find(x=>x.id===id);
-  if(!dest){toast("Bangalô não encontrado.");return false}
+  if(!dest){toast("Escolha um bangalô.");return false}
+  if(p.r.casal){toast("Para casais, use o botão Trocar.");return false}
   setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);save();toast("Mudança salva.")})}
 
 function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, digite SIM para remover ${p.name} do bangalô ${p.r.id}`,ph:"SIM"}],"Excluir",v=>{
@@ -389,6 +392,19 @@ function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, dig
   if(p.r.casal){toast("Casais devem ser alterados direto no banco de dados.");return}
   setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();save();toast("Participante removido.")})}
 
+function doSwap(pa,pb){const ra=pa.r.row,rb=pb.r.row;
+  if(pa.r.casal!==pb.r.casal){toast("Não é possível trocar casal com participante solteiro.");return}
+  if(ra===rb){const arr=ra[2].split(",");const i=arr.findIndex(s=>s.trim()===pa.entry),j=arr.findIndex(s=>s.trim()===pb.entry);if(i>-1&&j>-1){const t=arr[i];arr[i]=arr[j];arr[j]=t;ra[2]=arr.join(",")}}
+  else{ra[2]=ra[2].split(pa.entry).join(pb.entry);rb[2]=rb[2].split(pb.entry).join(pa.entry)}
+  save();toast("Troca realizada.")}
+function swapPerson(p){const others=people().filter(x=>norm(x.name)!==norm(p.name)).map(o=>[o.entry,`${o.name} · Bangalô ${o.r.id}`]);
+  ask("Trocar de lugar",[{label:p.name+" troca com…",options:others}],"Confirmar troca",other=>{
+  const q=people().find(x=>x.entry===other);if(!q){toast("Escolha com quem trocar.");return false}doSwap(p,q)},"Os dois trocam de bangalô; a função (ex.: Coord.) acompanha a pessoa trocada.")}
+$("t-swap").onclick=()=>{const ps=people().map(o=>[o.entry,`${o.name} · Bangalô ${o.r.id}`]);
+  ask("Trocar participantes de lugar",[{label:"Quem sai",options:ps},{label:"Vai para o lugar de",options:ps}],"Confirmar troca",(a,b)=>{
+  if(norm(a)===norm(b)){toast("Escolha duas pessoas diferentes.");return false}
+  const pa=people().find(x=>x.entry===a),pb=people().find(x=>x.entry===b);
+  if(!pa||!pb){toast("Selecione as duas pessoas.");return false}doSwap(pa,pb)},"Os dois trocam de bangalô. Funções como (Coord.) acompanham a pessoa trocada.")};
 $("t-note").onclick=()=>ask("Aviso da organização",[{label:"Mensagem",area:true,optional:true,ph:"Deixe em branco para remover o aviso atual"}],"Publicar aviso",m=>{
   m=m.trim();if(m)db.ref("cjas_announcement").set(m);else db.ref("cjas_announcement").remove();toast(m?"Aviso publicado.":"Aviso removido.")},"O aviso aparece no topo da página inicial.");
 $("t-pass").onclick=()=>ask("Alterar senha",[{label:"Nova senha",type:"password"}],"Salvar senha",p=>{adminPass=p;db.ref("cjas_pass").set(p);toast("Senha alterada.")});
