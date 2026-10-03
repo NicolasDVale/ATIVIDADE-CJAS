@@ -99,7 +99,6 @@ footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
 @page{size:A4;margin:8mm}
 @media print{body{background:#fff;padding:0;font-size:8pt}.bar,.stats,.nav,footer,.empty,.ov,#home,#badge,#list,.notice,#toast,.noprint{display:none!important}body[data-s=list] #list,body[data-s=badge] #badge{display:block!important}.badge{box-shadow:none;margin-top:2rem}.masthead{padding:.6rem 1rem;box-shadow:none}.chips{display:none}.bcard{break-inside:avoid;padding:.35rem .6rem;box-shadow:none}.wing.break{break-before:page}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
-<base target="_blank">
 </head>
 <body>
 <div class="page">
@@ -182,7 +181,8 @@ footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
     <button class="btn btn-p btn-sm" id="t-add">Novo participante</button>
     <button class="btn btn-s btn-sm" id="t-csv">Exportar planilha</button>
     <button class="btn btn-s btn-sm" id="t-note">Publicar aviso</button>
-    <button class="btn btn-s btn-sm" id="t-swap">Trocar participantes</button><button class="btn btn-s btn-sm" id="t-pass">Alterar senha</button>
+    <button class="btn btn-s btn-sm" id="t-swap">Trocar participantes</button>
+    <button class="btn btn-s btn-sm" id="t-pass">Alterar senha</button>
     <button class="btn btn-d btn-sm" id="t-out">Sair</button>
   </div>
   <input id="as" type="search" placeholder="Filtrar por nome ou bangalô">
@@ -253,11 +253,12 @@ function rooms(){const out=[];toArr(data).forEach(sec=>toArr(sec.groups).forEach
 })));return out}
 const people=()=>rooms().flatMap(r=>r.list.map(e=>({entry:e,name:clean(e),r})));
 const allNames=()=>[...new Set(people().map(p=>p.name))];
-const save=()=>db.ref("cjas_data").set(data);
+const fail=e=>toast("Erro ao salvar: "+((e&&(e.code||e.message))||e));
+const save=()=>db.ref("cjas_data").set(data).catch(fail);
 const getDoc=n=>{const v=docs[key(n)];return v&&typeof v==="object"?v.documento||"":v||""};
 
 db.ref("cjas_data").on("value",s=>{const v=s.val();if(v)data=v;else db.ref("cjas_data").set(INITIAL_DATA);refresh()},
-  e=>{console.warn("Firebase indisponível, usando dados locais",e);data=INITIAL_DATA;refresh()});
+  e=>{console.warn(e);toast("Sem acesso ao banco de dados: "+(e.code||e.message));data=INITIAL_DATA;refresh()});
 db.ref("cjas_docs").on("value",s=>{docs=s.val()||{};if(logged)renderAdmin()});
 db.ref("cjas_pass").on("value",s=>{if(s.val())adminPass=s.val();else db.ref("cjas_pass").set("cjas2026")});
 db.ref("cjas_announcement").on("value",s=>{const m=s.val();$("notice").style.display=m&&m.trim()?"block":"none";$("notice-text").textContent=m||""});
@@ -319,7 +320,10 @@ function card(r,g){const free=r.cap-r.list.length;
   const ul=mk("ul","occ");
   r.list.forEach(e=>{const li=mk("li");const nm=clean(e),rl=roleOf(e);li.dataset.s=norm(e);li.append(nm);if(rl)li.append(mk("span","role",rl));ul.append(li)});
   if(r.role){const li=mk("li");li.append(mk("span","role",r.role));ul.append(li)}
-  let capTxt,capCls="";if(free<0){capTxt=`${r.list.length} de ${r.cap} · ${Math.abs(free)} acima do limite`}else if(r.casal||free===0){capTxt=`${r.list.length} de ${r.cap} · completo`}else{capTxt=`${r.list.length} de ${r.cap} · ${free} ${free===1?"vaga livre":"vagas livres"}`;capCls=" free"}
+  let capTxt,capCls="";
+  if(free<0)capTxt=`${r.list.length} de ${r.cap} · ${-free} acima do limite`;
+  else if(r.casal||free===0)capTxt=`${r.list.length} de ${r.cap} · completo`;
+  else{capTxt=`${r.list.length} de ${r.cap} · ${free} ${free===1?"vaga livre":"vagas livres"}`;capCls=" free"}
   const cap=mk("div","cap"+capCls,capTxt);
   const f=mk("div","fill");f.style.width=Math.min(100,Math.round(r.list.length/r.cap*100))+"%";
   c.append(n,ul,cap,f);return c}
@@ -364,7 +368,7 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     const tr=mk("tr"),a=mk("td"),b=mk("td",null,"Bangalô "+p.r.id),d=mk("td"),ac=mk("td");
     a.append(mk("b",null,p.name));
     const inp=mk("input");inp.value=getDoc(p.name);inp.placeholder="RG";inp.setAttribute("aria-label","Documento de "+p.name);d.append(inp);
-    const s=mk("button","btn btn-p btn-sm","Salvar");s.onclick=()=>{db.ref("cjas_docs/"+key(p.name)).set(inp.value.trim());toast("Documento salvo.")};
+    const s=mk("button","btn btn-p btn-sm","Salvar");s.onclick=()=>{db.ref("cjas_docs/"+key(p.name)).set(inp.value.trim()).then(()=>toast("Documento salvo.")).catch(fail)};
     const m=mk("button","btn btn-s btn-sm","Mudar");m.onclick=()=>transfer(p);
     const x=mk("button","btn btn-d btn-sm","Excluir");x.onclick=()=>removePerson(p);
     const sw=mk("button","btn btn-s btn-sm","Trocar");sw.onclick=()=>openSwap(p);
@@ -372,67 +376,62 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     tr.append(a,b,d,ac);tb.append(tr)})}
 
 function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title} (${r.list.length}/${r.cap})${r.id===cur?" · atual":""}${r.list.length>=r.cap?" · cheio":""}`])}
-const setRoom=(r,list)=>{r.row[2]=list.join(", ")};
+const setRoom=(r,list)=>{r.row[2]=r.casal?list.join(" & ")+(r.role?` (${r.role})`:""):list.join(", ")};
 
 $("t-add").onclick=()=>ask("Novo participante",[
   {label:"Nome completo",ph:"Ex.: João da Silva"},{label:"Bangalô",options:roomOptions()}],"Adicionar",(name,id)=>{
   name=name.trim();const r=rooms().find(x=>x.id===id);
   if(!name||!r){toast("Preencha o nome e escolha um bangalô.");return false}
   if(allNames().some(n=>norm(n)===norm(name))){toast("Já existe um participante com esse nome.");return false}
-  setRoom(r,[...r.list,name]);refresh();save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, mesmo os completos.");
+  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, mesmo os completos.");
 
 function transfer(p){ask("Mudar de bangalô",[{label:p.name,options:roomOptions(p.r.id),value:p.r.id}],"Confirmar mudança",id=>{
   if(id===p.r.id)return;const dest=rooms().find(x=>x.id===id);
   if(!dest){toast("Escolha um bangalô.");return false}
   if(p.r.casal){toast("Para casais, use o botão Trocar.");return false}
-  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);refresh();save();toast("Mudança salva.")})}
+  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);save();toast("Mudança salva.")})}
 
 function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, digite SIM para remover ${p.name} do bangalô ${p.r.id}`,ph:"SIM"}],"Excluir",v=>{
   if(norm(v.trim())!=="sim"){toast("Digite SIM para confirmar.");return false}
   if(p.r.casal){toast("Casais devem ser alterados direto no banco de dados.");return}
-  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();refresh();save();toast("Participante removido.")})}
+  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();save();toast("Participante removido.")})}
 
 function resolvePerson(txt){txt=norm(txt);if(!txt)return null;
-  return people().find(p=>norm(p.name)===txt)||people().find(p=>norm(p.name).startsWith(txt))||null}
-/* campo de busca com sugestões para escolher uma pessoa */
+  const ps=people();return ps.find(p=>norm(p.name)===txt)||ps.find(p=>norm(p.name).startsWith(txt))||null}
 function personPicker(i,u){let picked=null;
   i.addEventListener("input",()=>{picked=null;u.innerHTML="";const q=norm(i.value.trim());
     if(!q){u.style.display="none";return}
-    const seen=new Set(),m=[];
-    for(const p of people()){const k=norm(p.name);if(seen.has(k))continue;seen.add(k);if(k.includes(q)){m.push(p);if(m.length>=8)break}}
+    const m=people().filter(p=>norm(p.name).includes(q)).slice(0,8);
     m.forEach(p=>{const li=mk("li",null,`${p.name} · Bangalô ${p.r.id}`);li.onclick=e=>{e.stopPropagation();i.value=p.name;picked=p;u.style.display="none"};u.append(li)});
     u.style.display=m.length?"block":"none"});
   return{get:()=>picked,set:p=>{picked=p;if(p)i.value=p.name}}}
-function doSwap(pa,pb){const ra=pa.r.row,rb=pb.r.row;
+function doSwap(pa,pb){
   if(pa.r.casal!==pb.r.casal){toast("Não é possível trocar casal com participante solteiro.");return false}
-  if(ra===rb){const arr=ra[2].split(",");const i=arr.findIndex(s=>s.trim()===pa.entry),j=arr.findIndex(s=>s.trim()===pb.entry);if(i>-1&&j>-1){const t=arr[i];arr[i]=arr[j];arr[j]=t;ra[2]=arr.join(",")}}
-  else{ra[2]=ra[2].split(pa.entry).join(pb.entry);rb[2]=rb[2].split(pb.entry).join(pa.entry)}
+  const A=pa.r.row,B=pb.r.row,ra=rooms().find(r=>r.row===A),rb=rooms().find(r=>r.row===B);
+  if(ra===rb){const l=[...ra.list],i=l.indexOf(pa.entry),j=l.indexOf(pb.entry);[l[i],l[j]]=[l[j],l[i]];setRoom(ra,l)}
+  else{setRoom(ra,ra.list.map(e=>e===pa.entry?pb.entry:e));setRoom(rb,rb.list.map(e=>e===pb.entry?pa.entry:e))}
   refresh();save();toast("Troca realizada.");return true}
 function openSwap(pre){
   const ov=mk("div","ov on"),m=mk("div","modal");
   const x=mk("button","btn btn-s btn-sm x","Fechar");x.onclick=()=>ov.remove();
   m.append(x,mk("h3",null,"Trocar participantes de lugar"));
-  m.append(Object.assign(mk("p",null,"Digite o nome e escolha na lista de sugestões. Funções como (Coord.) acompanham a pessoa trocada."),{style:"color:var(--mu);font-size:.88rem;margin:.3rem 0 1rem"}));
-  const gA=mk("div","fg"),lA=mk("label",null,"Quem sai");lA.htmlFor="sw-a";
-  const iA=mk("input");iA.id="sw-a";iA.placeholder="Digite o nome…";iA.autocomplete="off";
-  const uA=mk("ul","sug");uA.style.display="none";const wA=mk("div","ac");wA.append(iA,uA);gA.append(lA,wA);
-  const gB=mk("div","fg"),lB=mk("label",null,"Vai para o lugar de");lB.htmlFor="sw-b";
-  const iB=mk("input");iB.id="sw-b";iB.placeholder="Digite o nome…";iB.autocomplete="off";
-  const uB=mk("ul","sug");uB.style.display="none";const wB=mk("div","ac");wB.append(iB,uB);gB.append(lB,wB);
-  m.append(gA,gB);
+  m.append(Object.assign(mk("p",null,"Digite o nome e escolha na lista de sugestões. Funções como (Coord.) acompanham a pessoa."),{style:"color:var(--mu);font-size:.88rem;margin:.3rem 0 1rem"}));
+  const field=(lab,id)=>{const g=mk("div","fg"),l=mk("label",null,lab);l.htmlFor=id;
+    const i=mk("input");i.id=id;i.placeholder="Digite o nome";i.autocomplete="off";
+    const u=mk("ul","sug");u.style.display="none";const w=mk("div","ac");w.append(i,u);g.append(l,w);m.append(g);return[i,u]};
+  const [iA,uA]=field("Quem sai","sw-a"),[iB,uB]=field("Vai para o lugar de","sw-b");
+  const pickA=personPicker(iA,uA),pickB=personPicker(iB,uB);
   const b=mk("button","btn btn-p","Confirmar troca");b.style.width="100%";
   b.onclick=()=>{const pa=pickA.get()||resolvePerson(iA.value),pb=pickB.get()||resolvePerson(iB.value);
     if(!pa||!pb){toast("Escolha as duas pessoas pelas sugestões.");return}
-    if(norm(pa.name)===norm(pb.name)){toast("Escolha duas pessoas diferentes.");return}
+    if(pa.entry===pb.entry&&pa.r===pb.r){toast("Escolha duas pessoas diferentes.");return}
     if(doSwap(pa,pb))ov.remove()};
   m.append(b);ov.append(m);document.body.append(ov);
-  const pickA=personPicker(iA,uA),pickB=personPicker(iB,uB);
-  if(pre)pickA.set(pre);
-  iA.focus()}
+  if(pre)pickA.set(pre);iA.focus()}
 $("t-swap").onclick=()=>openSwap();
 $("t-note").onclick=()=>ask("Aviso da organização",[{label:"Mensagem",area:true,optional:true,ph:"Deixe em branco para remover o aviso atual"}],"Publicar aviso",m=>{
-  m=m.trim();if(m)db.ref("cjas_announcement").set(m);else db.ref("cjas_announcement").remove();toast(m?"Aviso publicado.":"Aviso removido.")},"O aviso aparece no topo da página inicial.");
-$("t-pass").onclick=()=>ask("Alterar senha",[{label:"Nova senha",type:"password"}],"Salvar senha",p=>{adminPass=p;db.ref("cjas_pass").set(p);toast("Senha alterada.")});
+  m=m.trim();(m?db.ref("cjas_announcement").set(m):db.ref("cjas_announcement").remove()).catch(fail);toast(m?"Aviso publicado.":"Aviso removido.")},"O aviso aparece no topo da página inicial.");
+$("t-pass").onclick=()=>ask("Alterar senha",[{label:"Nova senha",type:"password"}],"Salvar senha",p=>{adminPass=p;db.ref("cjas_pass").set(p).catch(fail);toast("Senha alterada.")});
 
 $("t-csv").onclick=()=>{const q=v=>`"${String(v).replace(/"/g,'""')}"`;
   let c="\uFEFFNome;Bangalô;Ala;Documento\n";
