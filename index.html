@@ -252,7 +252,7 @@ function rooms(){const out=[];toArr(data).forEach(sec=>toArr(sec.groups).forEach
 })));return out}
 const people=()=>rooms().flatMap(r=>r.list.map(e=>({entry:e,name:clean(e),r})));
 const allNames=()=>[...new Set(people().map(p=>p.name))];
-const save=()=>db.ref("cjas_data").set(data);
+const save=()=>db.ref("cjas_data").set(data).catch(e=>{console.error("Erro no Firebase:",e);toast("Erro ao salvar no banco de dados.");});
 const getDoc=n=>{const v=docs[key(n)];return v&&typeof v==="object"?v.documento||"":v||""};
 
 db.ref("cjas_data").on("value",s=>{const v=s.val();if(v)data=v;else db.ref("cjas_data").set(INITIAL_DATA);refresh()},
@@ -369,19 +369,19 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     const w=mk("div","acts");w.append(s,m,x);ac.append(w);
     tr.append(a,b,d,ac);tb.append(tr)})}
 
-function roomOptions(cur){return rooms().filter(r=>!r.casal&&(r.id===cur||r.list.length<r.cap)).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title} (${r.list.length}/${r.cap})`])}
+function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title} (${r.list.length}/${r.cap})`])}
 const setRoom=(r,list)=>{r.row[2]=list.join(", ")};
 
 $("t-add").onclick=()=>ask("Novo participante",[
   {label:"Nome completo",ph:"Ex.: João da Silva"},{label:"Bangalô",options:roomOptions()}],"Adicionar",(name,id)=>{
   name=name.trim();const r=rooms().find(x=>x.id===id);
-  if(!name||!r||r.list.length>=r.cap){toast("Esse bangalô está cheio.");return false}
+  if(!name||!r){toast("Selecione um bangalô válido.");return false}
   if(allNames().some(n=>norm(n)===norm(name))){toast("Já existe um participante com esse nome.");return false}
-  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Só aparecem bangalôs com vaga livre.");
+  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Selecione o bangalô desejado.");
 
 function transfer(p){ask("Mudar de bangalô",[{label:p.name,options:roomOptions(p.r.id),value:p.r.id}],"Confirmar mudança",id=>{
   if(id===p.r.id)return;const dest=rooms().find(x=>x.id===id);
-  if(!dest||dest.list.length>=dest.cap){toast("Esse bangalô está cheio.");return false}
+  if(!dest){toast("Bangalô não encontrado.");return false}
   setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);save();toast("Mudança salva.")})}
 
 function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, digite SIM para remover ${p.name} do bangalô ${p.r.id}`,ph:"SIM"}],"Excluir",v=>{
