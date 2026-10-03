@@ -367,7 +367,7 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     const s=mk("button","btn btn-p btn-sm","Salvar");s.onclick=()=>{db.ref("cjas_docs/"+key(p.name)).set(inp.value.trim());toast("Documento salvo.")};
     const m=mk("button","btn btn-s btn-sm","Mudar");m.onclick=()=>transfer(p);
     const x=mk("button","btn btn-d btn-sm","Excluir");x.onclick=()=>removePerson(p);
-    const sw=mk("button","btn btn-s btn-sm","Trocar");sw.onclick=()=>swapPerson(p);
+    const sw=mk("button","btn btn-s btn-sm","Trocar");sw.onclick=()=>openSwap(p);
     const w=mk("div","acts");w.append(s,m,sw,x);ac.append(w);
     tr.append(a,b,d,ac);tb.append(tr)})}
 
@@ -379,32 +379,57 @@ $("t-add").onclick=()=>ask("Novo participante",[
   name=name.trim();const r=rooms().find(x=>x.id===id);
   if(!name||!r){toast("Preencha o nome e escolha um bangalô.");return false}
   if(allNames().some(n=>norm(n)===norm(name))){toast("Já existe um participante com esse nome.");return false}
-  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, mesmo os completos.");
+  setRoom(r,[...r.list,name]);refresh();save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, mesmo os completos.");
 
 function transfer(p){ask("Mudar de bangalô",[{label:p.name,options:roomOptions(p.r.id),value:p.r.id}],"Confirmar mudança",id=>{
   if(id===p.r.id)return;const dest=rooms().find(x=>x.id===id);
   if(!dest){toast("Escolha um bangalô.");return false}
   if(p.r.casal){toast("Para casais, use o botão Trocar.");return false}
-  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);save();toast("Mudança salva.")})}
+  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);refresh();save();toast("Mudança salva.")})}
 
 function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, digite SIM para remover ${p.name} do bangalô ${p.r.id}`,ph:"SIM"}],"Excluir",v=>{
   if(norm(v.trim())!=="sim"){toast("Digite SIM para confirmar.");return false}
   if(p.r.casal){toast("Casais devem ser alterados direto no banco de dados.");return}
-  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();save();toast("Participante removido.")})}
+  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();refresh();save();toast("Participante removido.")})}
 
+function resolvePerson(txt){txt=norm(txt);if(!txt)return null;
+  return people().find(p=>norm(p.name)===txt)||people().find(p=>norm(p.name).startsWith(txt))||null}
+/* campo de busca com sugestões para escolher uma pessoa */
+function personPicker(i,u){let picked=null;
+  i.addEventListener("input",()=>{picked=null;u.innerHTML="";const q=norm(i.value.trim());
+    if(!q){u.style.display="none";return}
+    const seen=new Set(),m=[];
+    for(const p of people()){const k=norm(p.name);if(seen.has(k))continue;seen.add(k);if(k.includes(q)){m.push(p);if(m.length>=8)break}}
+    m.forEach(p=>{const li=mk("li",null,`${p.name} · Bangalô ${p.r.id}`);li.onclick=e=>{e.stopPropagation();i.value=p.name;picked=p;u.style.display="none"};u.append(li)});
+    u.style.display=m.length?"block":"none"});
+  return{get:()=>picked,set:p=>{picked=p;if(p)i.value=p.name}}}
 function doSwap(pa,pb){const ra=pa.r.row,rb=pb.r.row;
-  if(pa.r.casal!==pb.r.casal){toast("Não é possível trocar casal com participante solteiro.");return}
+  if(pa.r.casal!==pb.r.casal){toast("Não é possível trocar casal com participante solteiro.");return false}
   if(ra===rb){const arr=ra[2].split(",");const i=arr.findIndex(s=>s.trim()===pa.entry),j=arr.findIndex(s=>s.trim()===pb.entry);if(i>-1&&j>-1){const t=arr[i];arr[i]=arr[j];arr[j]=t;ra[2]=arr.join(",")}}
   else{ra[2]=ra[2].split(pa.entry).join(pb.entry);rb[2]=rb[2].split(pb.entry).join(pa.entry)}
-  save();toast("Troca realizada.")}
-function swapPerson(p){const others=people().filter(x=>norm(x.name)!==norm(p.name)).map(o=>[o.entry,`${o.name} · Bangalô ${o.r.id}`]);
-  ask("Trocar de lugar",[{label:p.name+" troca com…",options:others}],"Confirmar troca",other=>{
-  const q=people().find(x=>x.entry===other);if(!q){toast("Escolha com quem trocar.");return false}doSwap(p,q)},"Os dois trocam de bangalô; a função (ex.: Coord.) acompanha a pessoa trocada.")}
-$("t-swap").onclick=()=>{const ps=people().map(o=>[o.entry,`${o.name} · Bangalô ${o.r.id}`]);
-  ask("Trocar participantes de lugar",[{label:"Quem sai",options:ps},{label:"Vai para o lugar de",options:ps}],"Confirmar troca",(a,b)=>{
-  if(norm(a)===norm(b)){toast("Escolha duas pessoas diferentes.");return false}
-  const pa=people().find(x=>x.entry===a),pb=people().find(x=>x.entry===b);
-  if(!pa||!pb){toast("Selecione as duas pessoas.");return false}doSwap(pa,pb)},"Os dois trocam de bangalô. Funções como (Coord.) acompanham a pessoa trocada.")};
+  refresh();save();toast("Troca realizada.");return true}
+function openSwap(pre){
+  const ov=mk("div","ov on"),m=mk("div","modal");
+  const x=mk("button","btn btn-s btn-sm x","Fechar");x.onclick=()=>ov.remove();
+  m.append(x,mk("h3",null,"Trocar participantes de lugar"));
+  m.append(Object.assign(mk("p",null,"Digite o nome e escolha na lista de sugestões. Funções como (Coord.) acompanham a pessoa trocada."),{style:"color:var(--mu);font-size:.88rem;margin:.3rem 0 1rem"}));
+  const gA=mk("div","fg"),lA=mk("label",null,"Quem sai");lA.htmlFor="sw-a";
+  const iA=mk("input");iA.id="sw-a";iA.placeholder="Digite o nome…";iA.autocomplete="off";
+  const uA=mk("ul","sug");uA.style.display="none";const wA=mk("div","ac");wA.append(iA,uA);gA.append(lA,wA);
+  const gB=mk("div","fg"),lB=mk("label",null,"Vai para o lugar de");lB.htmlFor="sw-b";
+  const iB=mk("input");iB.id="sw-b";iB.placeholder="Digite o nome…";iB.autocomplete="off";
+  const uB=mk("ul","sug");uB.style.display="none";const wB=mk("div","ac");wB.append(iB,uB);gB.append(lB,wB);
+  m.append(gA,gB);
+  const b=mk("button","btn btn-p","Confirmar troca");b.style.width="100%";
+  b.onclick=()=>{const pa=pickA.get()||resolvePerson(iA.value),pb=pickB.get()||resolvePerson(iB.value);
+    if(!pa||!pb){toast("Escolha as duas pessoas pelas sugestões.");return}
+    if(norm(pa.name)===norm(pb.name)){toast("Escolha duas pessoas diferentes.");return}
+    if(doSwap(pa,pb))ov.remove()};
+  m.append(b);ov.append(m);document.body.append(ov);
+  const pickA=personPicker(iA,uA),pickB=personPicker(iB,uB);
+  if(pre)pickA.set(pre);
+  iA.focus()}
+$("t-swap").onclick=()=>openSwap();
 $("t-note").onclick=()=>ask("Aviso da organização",[{label:"Mensagem",area:true,optional:true,ph:"Deixe em branco para remover o aviso atual"}],"Publicar aviso",m=>{
   m=m.trim();if(m)db.ref("cjas_announcement").set(m);else db.ref("cjas_announcement").remove();toast(m?"Aviso publicado.":"Aviso removido.")},"O aviso aparece no topo da página inicial.");
 $("t-pass").onclick=()=>ask("Alterar senha",[{label:"Nova senha",type:"password"}],"Salvar senha",p=>{adminPass=p;db.ref("cjas_pass").set(p);toast("Senha alterada.")});
