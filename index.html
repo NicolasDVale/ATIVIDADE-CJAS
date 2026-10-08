@@ -240,6 +240,10 @@ const key=n=>n.replace(/[.#$\[\]\/%]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpp
 let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2600)}
 const openM=i=>$(i).classList.add("on"), closeM=i=>$(i).classList.remove("on");
 
+/* título da ala vem sempre do tipo da ala (não depende do que está salvo) */
+const WT={casal:"Bangalôs de casais (líderes)",fem:"Ala feminina",masc:"Ala masculina"};
+const wt=sec=>WT[sec.cls]||sec.title;
+
 /* ---------- dados e Firebase ---------- */
 firebase.initializeApp({databaseURL:"https://cjas-2026-default-rtdb.firebaseio.com/"});
 const db=firebase.database();
@@ -301,10 +305,10 @@ $("home-form").onsubmit=homeSearch;
 /* ---------- lista de bangalôs ---------- */
 function renderList(){const app=$("app");app.innerHTML="";
   toArr(data).forEach(sec=>{
-    const rs=rooms().filter(r=>r.sec===sec||r.sec.cls===sec.cls&&r.sec.title===sec.title);
+    const rs=rooms().filter(r=>r.sec===sec||r.sec.cls===sec.cls);
     const beds=rs.reduce((a,r)=>a+r.cap,0),used=rs.reduce((a,r)=>a+r.list.length,0);
     const w=mk("section","wing "+sec.cls+(sec.brk?" break":""));w.dataset.cls=sec.cls;
-    const h=mk("div","whead"),tb=mk("div");tb.append(mk("h2",null,sec.title),mk("small",null,`${used} de ${beds} vagas ocupadas`));
+    const h=mk("div","whead"),tb=mk("div");tb.append(mk("h2",null,wt(sec)),mk("small",null,`${used} de ${beds} vagas ocupadas`));
     h.append(tb);w.append(h);
     toArr(sec.groups).forEach(g=>{
       const gd=mk("div","grp");gd.dataset.lead=g.isLead||sec.cls==="casal"?"1":"0";
@@ -378,7 +382,7 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     const w=mk("div","acts");w.append(s,ed,m,sw,x);ac.append(w);
     tr.append(a,b,d,ac);tb.append(tr)})}
 
-function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title} (${r.list.length}/${r.cap})${r.id===cur?" · atual":""}${r.list.length>=r.cap?" · cheio":""}`])}
+function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${wt(r.sec)} (${r.list.length}/${r.cap})${r.id===cur?" · atual":""}${r.list.length>=r.cap?" · cheio":""}`])}
 const setRoom=(r,list)=>{r.row[2]=r.casal?list.join(" & ")+(r.role?` (${r.role})`:""):list.join(", ")};
 
 $("t-add").onclick=()=>ask("Novo participante",[
@@ -452,16 +456,14 @@ function editRoom(r0){
     {k:"num",label:"Número do bangalô",value:r0.id},
     {k:"cap",label:"Quantidade de vagas",type:"number",value:String(r0.cap)}];
   if(cas)F.push({k:"role",label:"Título do casal",value:r0.role,optional:true,ph:"Ex.: Casal Diretor"});
-  else{const o=[];secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>o.push([si+":"+gi,sec.title+(g.name?" · "+g.name:"")]))});
-    F.push({k:"dest",label:"Ala e grupo (para mudar de ala, escolha aqui)",options:o,value:cur})}
+  else{const o=[];secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>o.push([si+":"+gi,wt(sec)+(g.name?" · "+g.name:"")]))});
+    F.push({k:"dest",label:"Ala e grupo do bangalô",options:o,value:cur})}
   const hasG=!!r0.g.name;
-  if(hasG)F.push({k:"gname",label:"Nome do grupo atual (só o texto exibido)",value:r0.g.name});
-  F.push({k:"stitle",label:"Título da ala atual (só o texto exibido, não muda a ala)",value:r0.sec.title});
+  if(hasG)F.push({k:"gname",label:"Nome do grupo (muda para todos os bangalôs dele)",value:r0.g.name});
   ask("Editar bangalô "+r0.id,F,"Salvar",(...v)=>{
     const o={};F.forEach((d,i)=>o[d.k]=v[i]);
-    const num=o.num.trim(),cap=Number(o.cap),role=(o.role||"").replace(/\s+/g," ").trim();
-    const gname=(o.gname||"").replace(/\s+/g," ").trim(),stitle=o.stitle.replace(/\s+/g," ").trim();
-    if(!num||!stitle||(hasG&&!gname)){toast("Preencha os campos obrigatórios.");return false}
+    const num=o.num.trim(),cap=Number(o.cap),role=(o.role||"").replace(/\s+/g," ").trim(),gname=(o.gname||"").replace(/\s+/g," ").trim();
+    if(!num||(hasG&&!gname)){toast("Preencha os campos obrigatórios.");return false}
     if(!Number.isInteger(cap)||cap<1){toast("Informe uma quantidade de vagas válida.");return false}
     if(/[()]/.test(role)){toast("O título não pode ter parênteses.");return false}
     if(rooms().some(x=>x.id===num&&x.row!==r0.row)){toast("Já existe um bangalô com esse número.");return false}
@@ -469,15 +471,14 @@ function editRoom(r0){
     r.row[0]=num;r.row[1]=cap;
     if(cas){r.role=role;setRoom(r,r.list)}
     if(hasG)r.g.name=gname;
-    r.sec.title=stitle;
     if(!cas&&o.dest!==cur){const [si,gi]=o.dest.split(":").map(Number),dg=toArr(secs[si].groups)[gi];
       if(dg){r.g.rows=toArr(r.g.rows).filter(x=>x!==r.row);dg.rows=[...toArr(dg.rows),r.row].sort((a,b)=>Number(a[0])-Number(b[0]))}}
     refresh();save();toast("Bangalô atualizado.")},
   "Quem está no bangalô continua nele, inclusive ao mudar de ala.")}
 function moveRoom(){
   const secs=toArr(data),gopts=[];
-  secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>gopts.push([si+":"+gi,sec.title+(g.name?" · "+g.name:"")]))});
-  const ropts=rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title}${r.g.name?" · "+r.g.name:""} (${r.list.length}/${r.cap})`]);
+  secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>gopts.push([si+":"+gi,wt(sec)+(g.name?" · "+g.name:"")]))});
+  const ropts=rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${wt(r.sec)}${r.g.name?" · "+r.g.name:""} (${r.list.length}/${r.cap})`]);
   ask("Mover bangalô para outra ala",[{label:"Bangalô",options:ropts},{label:"Mover para",options:gopts}],"Mover bangalô",(id,dest)=>{
     const r=rooms().find(x=>x.id===id);const [si,gi]=dest.split(":").map(Number);
     const dsec=secs[si],dg=toArr(dsec.groups)[gi];
@@ -485,7 +486,7 @@ function moveRoom(){
     if(dg===r.g){toast("O bangalô já está nesse grupo.");return false}
     r.g.rows=toArr(r.g.rows).filter(x=>x!==r.row);
     dg.rows=[...toArr(dg.rows),r.row].sort((a,b)=>Number(a[0])-Number(b[0]));
-    refresh();save();toast(`Bangalô ${id} movido para ${dsec.title}.`)},
+    refresh();save();toast(`Bangalô ${id} movido para ${wt(dsec)}.`)},
   "Todos os ocupantes vão juntos. Para mudar só uma pessoa, use o botão Mudar.")}
 $("t-move").onclick=moveRoom;
 $("t-swap").onclick=()=>openSwap();
@@ -495,7 +496,7 @@ $("t-pass").onclick=()=>ask("Alterar senha",[{label:"Nova senha",type:"password"
 
 $("t-csv").onclick=()=>{const q=v=>`"${String(v).replace(/"/g,'""')}"`;
   let c="\uFEFFNome;Bangalô;Ala;Documento\n";
-  people().forEach(p=>{c+=[q(p.name),q("Bangalô "+p.r.id),q(p.r.sec.title),q(getDoc(p.name))].join(";")+"\n"});
+  people().forEach(p=>{c+=[q(p.name),q("Bangalô "+p.r.id),q(wt(p.r.sec)),q(getDoc(p.name))].join(";")+"\n"});
   const a=mk("a");a.href=URL.createObjectURL(new Blob([c],{type:"text/csv;charset=utf-8;"}));
   a.download="Relatorio_CJAS_2026_"+new Date().toISOString().slice(0,10)+".csv";document.body.append(a);a.click();a.remove()};
 
