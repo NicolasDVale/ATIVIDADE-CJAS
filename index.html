@@ -448,17 +448,19 @@ function openSwap(pre){
   m.append(b);ov.append(m);document.body.append(ov);
   if(pre)pickA.set(pre);iA.focus()}
 function editRoom(r0){
-  const cas=r0.casal,F=[
-    {label:"Número do bangalô",value:r0.id},
-    {label:"Quantidade de vagas",type:"number",value:String(r0.cap)}];
-  if(cas)F.push({label:"Título do casal",value:r0.role,optional:true,ph:"Ex.: Casal Diretor"});
+  const cas=r0.casal,secs=toArr(data),cur=secs.indexOf(r0.sec)+":"+toArr(r0.sec.groups).indexOf(r0.g),F=[
+    {k:"num",label:"Número do bangalô",value:r0.id},
+    {k:"cap",label:"Quantidade de vagas",type:"number",value:String(r0.cap)}];
+  if(cas)F.push({k:"role",label:"Título do casal",value:r0.role,optional:true,ph:"Ex.: Casal Diretor"});
+  else{const o=[];secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>o.push([si+":"+gi,sec.title+(g.name?" · "+g.name:"")]))});
+    F.push({k:"dest",label:"Ala e grupo (para mudar de ala, escolha aqui)",options:o,value:cur})}
   const hasG=!!r0.g.name;
-  if(hasG)F.push({label:"Nome do grupo (muda para todos os bangalôs dele)",value:r0.g.name});
-  F.push({label:"Título da ala (muda para todos os bangalôs dela)",value:r0.sec.title});
+  if(hasG)F.push({k:"gname",label:"Nome do grupo atual (só o texto exibido)",value:r0.g.name});
+  F.push({k:"stitle",label:"Título da ala atual (só o texto exibido, não muda a ala)",value:r0.sec.title});
   ask("Editar bangalô "+r0.id,F,"Salvar",(...v)=>{
-    const num=v[0].trim(),cap=Number(v[1]);let i=2;
-    const role=cas?v[i++].replace(/\s+/g," ").trim():"";
-    const gname=hasG?v[i++].replace(/\s+/g," ").trim():"",stitle=v[i].replace(/\s+/g," ").trim();
+    const o={};F.forEach((d,i)=>o[d.k]=v[i]);
+    const num=o.num.trim(),cap=Number(o.cap),role=(o.role||"").replace(/\s+/g," ").trim();
+    const gname=(o.gname||"").replace(/\s+/g," ").trim(),stitle=o.stitle.replace(/\s+/g," ").trim();
     if(!num||!stitle||(hasG&&!gname)){toast("Preencha os campos obrigatórios.");return false}
     if(!Number.isInteger(cap)||cap<1){toast("Informe uma quantidade de vagas válida.");return false}
     if(/[()]/.test(role)){toast("O título não pode ter parênteses.");return false}
@@ -468,8 +470,10 @@ function editRoom(r0){
     if(cas){r.role=role;setRoom(r,r.list)}
     if(hasG)r.g.name=gname;
     r.sec.title=stitle;
+    if(!cas&&o.dest!==cur){const [si,gi]=o.dest.split(":").map(Number),dg=toArr(secs[si].groups)[gi];
+      if(dg){r.g.rows=toArr(r.g.rows).filter(x=>x!==r.row);dg.rows=[...toArr(dg.rows),r.row].sort((a,b)=>Number(a[0])-Number(b[0]))}}
     refresh();save();toast("Bangalô atualizado.")},
-  cas?"O título do casal aparece no cartão do bangalô.":"Mudar o número ou as vagas não altera quem está no bangalô.")}
+  "Quem está no bangalô continua nele, inclusive ao mudar de ala.")}
 function moveRoom(){
   const secs=toArr(data),gopts=[];
   secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>gopts.push([si+":"+gi,sec.title+(g.name?" · "+g.name:"")]))});
