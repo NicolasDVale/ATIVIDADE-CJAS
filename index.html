@@ -182,6 +182,7 @@ footer{margin-top:3rem;text-align:center;color:var(--mu);font-size:.85rem}
     <button class="btn btn-s btn-sm" id="t-csv">Exportar planilha</button>
     <button class="btn btn-s btn-sm" id="t-note">Publicar aviso</button>
     <button class="btn btn-s btn-sm" id="t-swap">Trocar participantes</button>
+    <button class="btn btn-s btn-sm" id="t-move">Mover bangalô de ala</button>
     <button class="btn btn-s btn-sm" id="t-pass">Alterar senha</button>
     <button class="btn btn-d btn-sm" id="t-out">Sair</button>
   </div>
@@ -442,6 +443,20 @@ function openSwap(pre){
     if(doSwap(pa,pb))ov.remove()};
   m.append(b);ov.append(m);document.body.append(ov);
   if(pre)pickA.set(pre);iA.focus()}
+function moveRoom(){
+  const secs=toArr(data),gopts=[];
+  secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>gopts.push([si+":"+gi,sec.title+(g.name?" · "+g.name:"")]))});
+  const ropts=rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${r.sec.title}${r.g.name?" · "+r.g.name:""} (${r.list.length}/${r.cap})`]);
+  ask("Mover bangalô para outra ala",[{label:"Bangalô",options:ropts},{label:"Mover para",options:gopts}],"Mover bangalô",(id,dest)=>{
+    const r=rooms().find(x=>x.id===id);const [si,gi]=dest.split(":").map(Number);
+    const dsec=secs[si],dg=toArr(dsec.groups)[gi];
+    if(!r||!dg){toast("Escolha o bangalô e o destino.");return false}
+    if(dg===r.g){toast("O bangalô já está nesse grupo.");return false}
+    r.g.rows=toArr(r.g.rows).filter(x=>x!==r.row);
+    dg.rows=[...toArr(dg.rows),r.row].sort((a,b)=>Number(a[0])-Number(b[0]));
+    refresh();save();toast(`Bangalô ${id} movido para ${dsec.title}.`)},
+  "Todos os ocupantes vão juntos. Para mudar só uma pessoa, use o botão Mudar.")}
+$("t-move").onclick=moveRoom;
 $("t-swap").onclick=()=>openSwap();
 $("t-note").onclick=()=>ask("Aviso da organização",[{label:"Mensagem",area:true,optional:true,ph:"Deixe em branco para remover o aviso atual"}],"Publicar aviso",m=>{
   m=m.trim();(m?db.ref("cjas_announcement").set(m):db.ref("cjas_announcement").remove()).catch(fail);toast(m?"Aviso publicado.":"Aviso removido.")},"O aviso aparece no topo da página inicial.");
