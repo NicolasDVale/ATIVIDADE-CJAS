@@ -318,6 +318,7 @@ function card(r,g){const free=r.cap-r.list.length;
   const c=mk("div","bcard "+r.sec.cls);c.dataset.cls=r.sec.cls;c.dataset.lead=g.isLead||r.casal?"1":"0";c.dataset.free=r.casal?0:free;
   c.dataset.s=norm(`bangalo ${r.id} ${r.list.join(" ")} ${r.role}`);
   const n=mk("div","num");n.append("Bangalô",mk("b",null,r.id));
+  if(logged){const eb=mk("button","btn btn-s btn-sm noprint","Editar");eb.style.marginTop=".4rem";eb.onclick=()=>editRoom(r);n.append(eb)}
   const ul=mk("ul","occ");
   r.list.forEach(e=>{const li=mk("li");const nm=clean(e),rl=roleOf(e);li.dataset.s=norm(e);li.append(nm);if(rl)li.append(mk("span","role",rl));ul.append(li)});
   if(r.role){const li=mk("li");li.append(mk("span","role",r.role));ul.append(li)}
@@ -358,9 +359,9 @@ function ask(title,fields,ok,cb,note){const ov=mk("div","ov on"),m=mk("div","mod
 function openAdmin(){openM(logged?"m-admin":"m-login");if(logged)renderAdmin()}
 $("open-admin").onclick=$("open-admin2").onclick=openAdmin;
 $("login-form").onsubmit=e=>{e.preventDefault();
-  if($("lu").value==="admincjas"&&$("lp").value===adminPass){logged=true;sessionStorage.setItem("cjas_logged","1");$("lp").value="";closeM("m-login");openM("m-admin");renderAdmin()}
+  if($("lu").value==="admincjas"&&$("lp").value===adminPass){logged=true;sessionStorage.setItem("cjas_logged","1");$("lp").value="";closeM("m-login");openM("m-admin");renderAdmin();renderList()}
   else toast("Usuário ou senha incorretos.")};
-$("t-out").onclick=()=>{logged=false;sessionStorage.removeItem("cjas_logged");closeM("m-admin")};
+$("t-out").onclick=()=>{logged=false;sessionStorage.removeItem("cjas_logged");closeM("m-admin");renderList()};
 $("as").oninput=()=>renderAdmin();
 
 function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").value.trim());
@@ -398,19 +399,22 @@ function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, dig
   if(p.r.casal){toast("Casais devem ser alterados direto no banco de dados.");return}
   setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();save();toast("Participante removido.")})}
 
-function editName(p){ask("Corrigir nome",[{label:"Nome do participante",value:p.name}],"Salvar nome",v=>{
-  const nn=v.replace(/\s+/g," ").trim();
+function editName(p){const cas=p.r.casal,role0=cas?p.r.role:roleOf(p.entry);
+  ask("Editar participante",[{label:"Nome do participante",value:p.name},
+    {label:cas?"Título do casal (vale para os dois)":"Função ou título (opcional)",value:role0,optional:true,ph:cas?"Ex.: Casal Diretor":"Ex.: Coord., Mídia, TI"}],"Salvar",(v,rv)=>{
+  const nn=v.replace(/\s+/g," ").trim(),role=rv.replace(/\s+/g," ").trim();
   if(!nn){toast("Digite o nome.");return false}
   if(/[,&()]/.test(nn)){toast("O nome não pode ter vírgula, & ou parênteses.");return false}
-  if(nn===p.name)return;
-  const dup=people().some(q=>norm(q.name)===norm(nn)&&!(q.r.row===p.r.row&&q.entry===p.entry));
-  if(dup){toast("Já existe um participante com esse nome.");return false}
-  const role=roleOf(p.entry),entry=nn+(role?` (${role})`:"");
+  if(/[()]/.test(role)||(!cas&&/,/.test(role))){toast(cas?"O título não pode ter parênteses.":"A função não pode ter vírgula ou parênteses.");return false}
+  const nameChanged=nn!==p.name;
+  if(!nameChanged&&role===role0)return;
+  if(nameChanged&&people().some(q=>norm(q.name)===norm(nn)&&!(q.r.row===p.r.row&&q.entry===p.entry))){toast("Já existe um participante com esse nome.");return false}
   const r=rooms().find(x=>x.row===p.r.row);
-  setRoom(r,r.list.map(e=>e===p.entry?entry:e));
-  const ok=key(p.name),nk=key(nn),d=docs[ok];
-  if(d!==undefined&&d!==null){db.ref("cjas_docs/"+nk).set(d).catch(fail);db.ref("cjas_docs/"+ok).remove().catch(fail)}
-  refresh();save();toast("Nome atualizado.")},"Funções como (Coord.) e o documento são mantidos.")}
+  if(cas){r.role=role;setRoom(r,r.list.map(e=>e===p.entry?nn:e))}
+  else setRoom(r,r.list.map(e=>e===p.entry?nn+(role?` (${role})`:""):e));
+  if(nameChanged){const ok=key(p.name),nk=key(nn),d=docs[ok];
+    if(d!==undefined&&d!==null){db.ref("cjas_docs/"+nk).set(d).catch(fail);db.ref("cjas_docs/"+ok).remove().catch(fail)}}
+  refresh();save();toast("Alteração salva.")},"Deixe a função em branco para removê-la.")}
 function resolvePerson(txt){txt=norm(txt);if(!txt)return null;
   const ps=people();return ps.find(p=>norm(p.name)===txt)||ps.find(p=>norm(p.name).startsWith(txt))||null}
 function personPicker(i,u){let picked=null;
@@ -443,6 +447,29 @@ function openSwap(pre){
     if(doSwap(pa,pb))ov.remove()};
   m.append(b);ov.append(m);document.body.append(ov);
   if(pre)pickA.set(pre);iA.focus()}
+function editRoom(r0){
+  const cas=r0.casal,F=[
+    {label:"Número do bangalô",value:r0.id},
+    {label:"Quantidade de vagas",type:"number",value:String(r0.cap)}];
+  if(cas)F.push({label:"Título do casal",value:r0.role,optional:true,ph:"Ex.: Casal Diretor"});
+  const hasG=!!r0.g.name;
+  if(hasG)F.push({label:"Nome do grupo (muda para todos os bangalôs dele)",value:r0.g.name});
+  F.push({label:"Título da ala (muda para todos os bangalôs dela)",value:r0.sec.title});
+  ask("Editar bangalô "+r0.id,F,"Salvar",(...v)=>{
+    const num=v[0].trim(),cap=Number(v[1]);let i=2;
+    const role=cas?v[i++].replace(/\s+/g," ").trim():"";
+    const gname=hasG?v[i++].replace(/\s+/g," ").trim():"",stitle=v[i].replace(/\s+/g," ").trim();
+    if(!num||!stitle||(hasG&&!gname)){toast("Preencha os campos obrigatórios.");return false}
+    if(!Number.isInteger(cap)||cap<1){toast("Informe uma quantidade de vagas válida.");return false}
+    if(/[()]/.test(role)){toast("O título não pode ter parênteses.");return false}
+    if(rooms().some(x=>x.id===num&&x.row!==r0.row)){toast("Já existe um bangalô com esse número.");return false}
+    const r=rooms().find(x=>x.row===r0.row);
+    r.row[0]=num;r.row[1]=cap;
+    if(cas){r.role=role;setRoom(r,r.list)}
+    if(hasG)r.g.name=gname;
+    r.sec.title=stitle;
+    refresh();save();toast("Bangalô atualizado.")},
+  cas?"O título do casal aparece no cartão do bangalô.":"Mudar o número ou as vagas não altera quem está no bangalô.")}
 function moveRoom(){
   const secs=toArr(data),gopts=[];
   secs.forEach((sec,si)=>{if(sec.cls==="casal")return;toArr(sec.groups).forEach((g,gi)=>gopts.push([si+":"+gi,sec.title+(g.name?" · "+g.name:"")]))});
