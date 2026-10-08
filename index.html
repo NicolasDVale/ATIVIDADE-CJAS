@@ -275,7 +275,7 @@ function show(id){document.body.dataset.s=id;["home","badge","list"].forEach(s=>
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeM(b.dataset.close));
 
-function updateStats(){let t=0,f=0,m=0,free=0;rooms().forEach(r=>{const n=r.list.length;t+=n;if(r.sec.cls==="fem")f+=n;if(r.sec.cls==="masc")m+=n;if(!r.casal)free+=Math.max(0,r.cap-n)});
+function updateStats(){let t=0,f=0,m=0,free=0;rooms().forEach(r=>{const n=r.list.length;t+=n;if(r.sec.cls==="fem")f+=n;if(r.sec.cls==="masc")m+=n;free+=Math.max(0,r.cap-n)});
   $("s-total").textContent=t;$("s-fem").textContent=f;$("s-masc").textContent=m;$("s-free").textContent=free}
 
 /* ---------- autocompletar ---------- */
@@ -319,7 +319,7 @@ function renderList(){const app=$("app");app.innerHTML="";
   filterCards()}
 
 function card(r,g){const free=r.cap-r.list.length;
-  const c=mk("div","bcard "+r.sec.cls);c.dataset.cls=r.sec.cls;c.dataset.lead=g.isLead||r.casal?"1":"0";c.dataset.free=r.casal?0:free;
+  const c=mk("div","bcard "+r.sec.cls);c.dataset.cls=r.sec.cls;c.dataset.lead=g.isLead||r.casal?"1":"0";c.dataset.free=Math.max(0,free);
   c.dataset.s=norm(`bangalo ${r.id} ${r.list.join(" ")} ${r.role}`);
   const n=mk("div","num");n.append("Bangalô",mk("b",null,r.id));
   if(logged){const eb=mk("button","btn btn-s btn-sm noprint","Editar");eb.style.marginTop=".4rem";eb.onclick=()=>editRoom(r);n.append(eb)}
@@ -328,7 +328,7 @@ function card(r,g){const free=r.cap-r.list.length;
   if(r.role){const li=mk("li");li.append(mk("span","role",r.role));ul.append(li)}
   let capTxt,capCls="";
   if(free<0)capTxt=`${r.list.length} de ${r.cap} · ${-free} acima do limite`;
-  else if(r.casal||free===0)capTxt=`${r.list.length} de ${r.cap} · completo`;
+  else if(free===0)capTxt=`${r.list.length} de ${r.cap} · completo`;
   else{capTxt=`${r.list.length} de ${r.cap} · ${free} ${free===1?"vaga livre":"vagas livres"}`;capCls=" free"}
   const cap=mk("div","cap"+capCls,capTxt);
   const f=mk("div","fill");f.style.width=Math.min(100,Math.round(r.list.length/r.cap*100))+"%";
@@ -382,25 +382,25 @@ function renderAdmin(){const tb=$("tb");tb.innerHTML="";const t=norm($("as").val
     const w=mk("div","acts");w.append(s,ed,m,sw,x);ac.append(w);
     tr.append(a,b,d,ac);tb.append(tr)})}
 
-function roomOptions(cur){return rooms().filter(r=>!r.casal).map(r=>[r.id,`Bangalô ${r.id} · ${wt(r.sec)} (${r.list.length}/${r.cap})${r.id===cur?" · atual":""}${r.list.length>=r.cap?" · cheio":""}`])}
+function roomOptions(cur){return rooms().map(r=>[r.id,`Bangalô ${r.id} · ${wt(r.sec)} (${r.list.length}/${r.cap})${r.id===cur?" · atual":""}${r.list.length>=r.cap?" · cheio":""}`])}
 const setRoom=(r,list)=>{r.row[2]=r.casal?list.join(" & ")+(r.role?` (${r.role})`:""):list.join(", ")};
 
 $("t-add").onclick=()=>ask("Novo participante",[
   {label:"Nome completo",ph:"Ex.: João da Silva"},{label:"Bangalô",options:roomOptions()}],"Adicionar",(name,id)=>{
   name=name.trim();const r=rooms().find(x=>x.id===id);
   if(!name||!r){toast("Preencha o nome e escolha um bangalô.");return false}
+  if(/[,&()]/.test(name)){toast("O nome não pode ter vírgula, & ou parênteses.");return false}
   if(allNames().some(n=>norm(n)===norm(name))){toast("Já existe um participante com esse nome.");return false}
-  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, mesmo os completos.");
+  setRoom(r,[...r.list,name]);save();toast("Participante adicionado ao bangalô "+id+".")},"Qualquer bangalô pode ser escolhido, inclusive os de casais. Se passar das vagas, aumente-as em Editar bangalô.");
 
 function transfer(p){ask("Mudar de bangalô",[{label:p.name,options:roomOptions(p.r.id),value:p.r.id}],"Confirmar mudança",id=>{
   if(id===p.r.id)return;const dest=rooms().find(x=>x.id===id);
   if(!dest){toast("Escolha um bangalô.");return false}
-  if(p.r.casal){toast("Para casais, use o botão Trocar.");return false}
-  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,p.entry]);save();toast("Mudança salva.")})}
+  const ent=dest.casal?clean(p.entry):p.entry;
+  setRoom(p.r,p.r.list.filter(e=>e!==p.entry));setRoom(dest,[...dest.list,ent]);save();toast("Mudança salva.")})}
 
 function removePerson(p){ask("Excluir participante",[{label:`Para confirmar, digite SIM para remover ${p.name} do bangalô ${p.r.id}`,ph:"SIM"}],"Excluir",v=>{
   if(norm(v.trim())!=="sim"){toast("Digite SIM para confirmar.");return false}
-  if(p.r.casal){toast("Casais devem ser alterados direto no banco de dados.");return}
   setRoom(p.r,p.r.list.filter(e=>e!==p.entry));db.ref("cjas_docs/"+key(p.name)).remove();save();toast("Participante removido.")})}
 
 function editName(p){const cas=p.r.casal,role0=cas?p.r.role:roleOf(p.entry);
@@ -429,16 +429,16 @@ function personPicker(i,u){let picked=null;
     u.style.display=m.length?"block":"none"});
   return{get:()=>picked,set:p=>{picked=p;if(p)i.value=p.name}}}
 function doSwap(pa,pb){
-  if(pa.r.casal!==pb.r.casal){toast("Não é possível trocar casal com participante solteiro.");return false}
   const A=pa.r.row,B=pb.r.row,ra=rooms().find(r=>r.row===A),rb=rooms().find(r=>r.row===B);
+  const fit=(e,r)=>r.casal?clean(e):e;
   if(ra===rb){const l=[...ra.list],i=l.indexOf(pa.entry),j=l.indexOf(pb.entry);[l[i],l[j]]=[l[j],l[i]];setRoom(ra,l)}
-  else{setRoom(ra,ra.list.map(e=>e===pa.entry?pb.entry:e));setRoom(rb,rb.list.map(e=>e===pb.entry?pa.entry:e))}
+  else{setRoom(ra,ra.list.map(e=>e===pa.entry?fit(pb.entry,ra):e));setRoom(rb,rb.list.map(e=>e===pb.entry?fit(pa.entry,rb):e))}
   refresh();save();toast("Troca realizada.");return true}
 function openSwap(pre){
   const ov=mk("div","ov on"),m=mk("div","modal");
   const x=mk("button","btn btn-s btn-sm x","Fechar");x.onclick=()=>ov.remove();
   m.append(x,mk("h3",null,"Trocar participantes de lugar"));
-  m.append(Object.assign(mk("p",null,"Digite o nome e escolha na lista de sugestões. Funções como (Coord.) acompanham a pessoa."),{style:"color:var(--mu);font-size:.88rem;margin:.3rem 0 1rem"}));
+  m.append(Object.assign(mk("p",null,"Digite o nome e escolha na lista de sugestões. Funções como (Coord.) acompanham a pessoa, exceto ao entrar em quarto de casal."),{style:"color:var(--mu);font-size:.88rem;margin:.3rem 0 1rem"}));
   const field=(lab,id)=>{const g=mk("div","fg"),l=mk("label",null,lab);l.htmlFor=id;
     const i=mk("input");i.id=id;i.placeholder="Digite o nome";i.autocomplete="off";
     const u=mk("ul","sug");u.style.display="none";const w=mk("div","ac");w.append(i,u);g.append(l,w);m.append(g);return[i,u]};
